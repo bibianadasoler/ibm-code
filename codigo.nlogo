@@ -20,7 +20,7 @@ to go
   ask turtles
   [
     ; head in a random direction
-    rt random-float 360
+    rt random-float 45
     set xc xcor + (step-size * dx) ; walk the distance of step-size
     set yc ycor + (step-size * dy)
     set xcor xc
