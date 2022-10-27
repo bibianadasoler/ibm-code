@@ -1,32 +1,67 @@
-turtles-own
+turtles-own ; traits that each turtle has
 [
-  xc     ; unwrapped xcor
-  yc     ; unwrapped ycor
-  ;dist   ; distance from home using xc, yc
+  xc     ; x coordenate of the turtle
+  yc     ; y coordenate of the turtle
+  xc-hist     ; xc records
+  yc-hist     ; yc records
+]
+
+patches-own ; traits that each patche has
+[
+  resistance-value ; resistance value of each land cover class
 ]
 
 to setup
   clear-all
-  create-turtles num-individuos ; button in interface
-  [set size 2.5
-    setxy random-xcor random-ycor ; random position
-    set shape "footprint other" ; change turtle shpae
- ]
-  ;setup-patches
+  setup-landscape
+  crt-ind ; create individuals
   reset-ticks
 end
 
 to go
   ask turtles
   [
-    ; head in a random direction
-    rt random-float 45
-    set xc xcor + (step-size * dx) ; walk the distance of step-size
-    set yc ycor + (step-size * dy)
-    set xcor xc
-    set ycor yc
+    move ; movement in each tick
 ]
 tick
+end
+
+to setup-landscape
+  ask patches [
+    set resistance-value random 2 ; define the value for each patch
+    set pcolor resistance-value * 18 ; define the color according to the class - black = 0 no movement ; pink = 1 free move
+  ]
+end
+
+to crt-ind ; to create individuals
+    create-turtles num-individuos [; num choosen in interfacte button
+      setxy random-pxcor random-pycor ; random position of individuals centered in the patch = ou random position at all? dai random-xcor
+      set xc xcor
+      set yc ycor
+      set size 1.5
+      set shape "footprint other" ; change turtle shape
+      move-to one-of patches with [resistance-value = 1] ; nessa ordem ele nasce, move para a classe rosa e depois comeca
+                                     ; desenhar a linha - se colocar o move embaixo fica desenha a linha do movimento
+      set pen-mode "down" ; draw a line of turtle movement
+  ]
+end
+
+to move ; move based on the type-of-walk button
+  ; random
+    if type-of-walk = "random" [
+    set heading random-float 360 ; head in a random direction ;;random-float any number from 0
+    fd step-size ; walk the distance of step-size
+    set xc xcor ; define new xc value
+    set yc ycor
+  ]
+  ; correlated
+    if type-of-walk = "correlated" [
+    rt random-normal 0 std-dev ; ENTENDER O QUE ESTA ACONTECENDO - direction that is no more than X degrees off previous heading
+    fd step-size ; walk the distance of step-size
+    set xc xcor ; define new xc value
+    set yc ycor
+  ]
+  ; other
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -43,8 +78,8 @@ GRAPHICS-WINDOW
 1
 1
 0
-1
-1
+0
+0
 1
 -16
 16
@@ -80,9 +115,9 @@ SLIDER
 94
 num-individuos
 num-individuos
-0
-100
-10.0
+1
+10
+5.0
 1
 1
 NIL
@@ -114,7 +149,7 @@ step-size
 step-size
 0
 10
-7.0
+1.0
 1
 1
 NIL
@@ -136,6 +171,31 @@ NIL
 NIL
 NIL
 1
+
+CHOOSER
+11
+159
+149
+204
+type-of-walk
+type-of-walk
+"random" "correlated"
+0
+
+SLIDER
+11
+215
+183
+248
+std-dev
+std-dev
+0
+45
+35.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
