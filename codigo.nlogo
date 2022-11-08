@@ -2,19 +2,23 @@ turtles-own ; traits that each turtle has
 [
   xc     ; x coordenate of the turtle
   yc     ; y coordenate of the turtle
-  xc-hist     ; xc records
-  yc-hist     ; yc records
+  xc-hist  ; xc records
+  yc-hist    ; yc records
 ]
 
 patches-own ; traits that each patche has
-[
+ [
   resistance-value ; resistance value of each land cover class
-]
+ ]
 
 to setup
   clear-all
   setup-landscape
   crt-ind ; create individuals
+  ask turtles [
+    set xc-hist lput xc xc-hist ; add first xc to xc-hist list
+    set yc-hist lput yc yc-hist ; add first yc to yc-hist list
+  ]
   reset-ticks
 end
 
@@ -22,8 +26,8 @@ to go
   ask turtles
   [
     move ; movement in each tick
-]
-tick
+  ]
+  tick
 end
 
 to setup-landscape
@@ -35,13 +39,14 @@ end
 
 to crt-ind ; to create individuals
     create-turtles num-individuos [; num choosen in interfacte button
+      set shape "footprint other" ; change turtle shape
       setxy random-pxcor random-pycor ; random position of individuals centered in the patch = ou random position at all? dai random-xcor
+   ;   move-to one-of patches with [resistance-value = 1] ; nasce e vai para a classe de resistencia 1 depois registra a coord
       set xc xcor
       set yc ycor
+      set xc-hist [] ;create an empty list to store x coord
+      set yc-hist [] ;create an empty list to store x coord
       set size 1.5
-      set shape "footprint other" ; change turtle shape
-      move-to one-of patches with [resistance-value = 1] ; nessa ordem ele nasce, move para a classe rosa e depois comeca
-                                     ; desenhar a linha - se colocar o move embaixo fica desenha a linha do movimento
       set pen-mode "down" ; draw a line of turtle movement
   ]
 end
@@ -53,6 +58,8 @@ to move ; move based on the type-of-walk button
     fd step-size ; walk the distance of step-size
     set xc xcor ; define new xc value
     set yc ycor
+    set xc-hist lput xc xc-hist ; add xc to xc-hist list
+    set yc-hist lput yc yc-hist ; add yc to yc-hist list
   ]
   ; correlated
     if type-of-walk = "correlated" [
@@ -60,8 +67,22 @@ to move ; move based on the type-of-walk button
     fd step-size ; walk the distance of step-size
     set xc xcor ; define new xc value
     set yc ycor
+    set xc-hist lput xc xc-hist ; add xc to xc-hist list
+    set yc-hist lput yc yc-hist ; add yc to yc-hist list
   ]
-  ; other
+  ; other types?
+end
+
+to save
+ ask turtles [
+  file-open user-new-file
+  foreach sort turtles [ ind ->
+      ask ind [
+        file-write (word self ": xc-hist: " xc-hist ": yc-hist: " yc-hist)
+      ]
+    ]
+  file-close
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -117,20 +138,20 @@ num-individuos
 num-individuos
 1
 10
-5.0
+3.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-85
-11
-148
-44
-NIL
+173
+10
+237
+43
 go
-T
+repeat 100 [go]
+NIL
 1
 T
 OBSERVER
@@ -156,10 +177,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-159
-11
-240
-44
+84
+10
+165
+43
 go once
 go
 NIL
@@ -180,7 +201,7 @@ CHOOSER
 type-of-walk
 type-of-walk
 "random" "correlated"
-0
+1
 
 SLIDER
 11
@@ -196,6 +217,23 @@ std-dev
 1
 NIL
 HORIZONTAL
+
+BUTTON
+17
+285
+106
+318
+NIL
+save
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
