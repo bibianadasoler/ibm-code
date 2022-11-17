@@ -1,25 +1,20 @@
-turtles-own ; traits that each turtle has
-[
-  xc     ; x coordenate of the turtle
-  yc     ; y coordenate of the turtle
-  xc-hist  ; xc records
-  yc-hist    ; yc records
-]
-
 patches-own ; traits that each patche has
  [
   resistance-value ; resistance value of each land cover class
+ ]
+turtles-own
+ [
+  perception
+  y
  ]
 
 to setup
   clear-all
   setup-landscape
   crt-ind ; create individuals
-  ask turtles [
-    set xc-hist lput xc xc-hist ; add first xc to xc-hist list
-    set yc-hist lput yc yc-hist ; add first yc to yc-hist list
-  ]
   reset-ticks
+  carefully [ file-delete "coordinates.txt" ] [ ] ; check if there is a file with this name and remove it
+  file-open "coordinates.txt" ; create a txt file to store the coordinates
 end
 
 to go
@@ -28,24 +23,24 @@ to go
     move ; movement in each tick
   ]
   tick
+  save-coord ; save coordinates in each go tick
 end
 
 to setup-landscape
   ask patches [
     set resistance-value random 2 ; define the value for each patch
-    set pcolor resistance-value * 18 ; define the color according to the class - black = 0 no movement ; pink = 1 free move
+    set pcolor resistance-value * 18 ; define the color according to the class - black = 0 free move ; pink = 1 no movement
   ]
 end
 
 to crt-ind ; to create individuals
-    create-turtles num-individuos [; num choosen in interfacte button
+    create-turtles num-individuos [; num choosen in interface button
       set shape "footprint other" ; change turtle shape
+      set perception random perceptual-range ; each individual has a particular perceptual-range
       setxy random-pxcor random-pycor ; random position of individuals centered in the patch = ou random position at all? dai random-xcor
-   ;   move-to one-of patches with [resistance-value = 1] ; nasce e vai para a classe de resistencia 1 depois registra a coord
-      set xc xcor
-      set yc ycor
-      set xc-hist [] ;create an empty list to store x coord
-      set yc-hist [] ;create an empty list to store x coord
+      move-to one-of patches with [resistance-value = 0] ; nasce e vai para a classe de resistencia 0 depois registra a coord
+      set xcor xcor
+      set ycor ycor
       set size 1.5
       set pen-mode "down" ; draw a line of turtle movement
   ]
@@ -55,40 +50,53 @@ to move ; move based on the type-of-walk button
   ; random
     if type-of-walk = "random" [
     set heading random-float 360 ; head in a random direction ;;random-float any number from 0
-    fd step-size ; walk the distance of step-size
-    set xc xcor ; define new xc value
-    set yc ycor
-    set xc-hist lput xc xc-hist ; add xc to xc-hist list
-    set yc-hist lput yc yc-hist ; add yc to yc-hist list
+    ;fd step-size ; walk the distance of step-size
+      move-to one-of neighbors with [resistance-value = 0]  ; TENTATIVAS
   ]
   ; correlated
     if type-of-walk = "correlated" [
-    rt random-normal 0 std-dev ; ENTENDER O QUE ESTA ACONTECENDO - direction that is no more than X degrees off previous heading
-    fd step-size ; walk the distance of step-size
-    set xc xcor ; define new xc value
-    set yc ycor
-    set xc-hist lput xc xc-hist ; add xc to xc-hist list
-    set yc-hist lput yc yc-hist ; add yc to yc-hist list
+     set y random-normal 0 std-dev ; direction that is no more than X degrees off previous heading
+     print y ; apenas para ver o que acontece em cada rodada - voltar rt para random-normal 0 std-dev
+     rt y ; apenas para ver o que acontece em cada rodada - voltar rt para random-normal 0 std-dev
+     fd step-size ; walk the distance of step-size
+   ]
+  ; other types? levy!
+  if type-of-walk = "teste-perception-resistance" [
+    set y random-normal 0 std-dev ; direction that is no more than X degrees off previous heading
+     print y ; apenas para ver o que acontece em cada rodada - voltar rt para random-normal 0 std-dev
+     rt y ; apenas para ver o que acontece em cada rodada - voltar rt para random-normal 0 std-dev
+    if any? patches in-radius perceptual-range with [resistance-value = 0] [
+      move-to one-of patches in-radius step-size with [resistance-value = 0 and distance step-size] ; AQUI TA INDO PARA UM PATCH ALEATORIO DENTRO DO RAIO DO TAMANHO DE PASSO - MAS AS VEZES ANDA MENOS QUE O PASSO
+    ]
   ]
-  ; other types?
+  if type-of-walk = "other-teste" [
+    set y random-normal 0 std-dev ; direction that is no more than X degrees off previous heading
+    print y ; apenas para ver o que acontece em cada rodada - voltar rt para random-normal 0 std-dev
+    rt y
+    ifelse any? ( patches with [resistance-value = 0] ) in-cone perceptual-range 180 [
+      ; ask patches in-cone perceptual-range 60 [ set pcolor red ]
+    ;  face one-of patches in-radius step-size with [resistance-value = 0]
+      forward step-size
+     ; move-to one-of patch-at-heading-and-distance y step-size
+    ]
+    ;ask turtles [ print patches with [resistance-value = 0] in-cone perceptual-range 180  ask ( patches with [resistance-value = 0] )in-cone perceptual-range 180 [ set pcolor red ] ]
+    [ print "NADA" ] ; se nao tiver patch ele nao anda
+  ]
 end
 
-to save
- ask turtles [
-  file-open user-new-file
+
+to save-coord ; NAO ESTA SALVANDO TICK 0 = COORDENADA INICIAL
   foreach sort turtles [ ind ->
-      ask ind [
-        file-write (word self ": xc-hist: " xc-hist ": yc-hist: " yc-hist)
-      ]
+    ask ind [
+      file-print (word who "," xcor "," ycor "," ticks) ; store in the txt file the columns: which individual, its x and y coordinates and which tick
     ]
-  file-close
   ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-242
+260
 10
-679
+697
 448
 -1
 -1
@@ -99,8 +107,8 @@ GRAPHICS-WINDOW
 1
 1
 0
-0
-0
+1
+1
 1
 -16
 16
@@ -138,16 +146,16 @@ num-individuos
 num-individuos
 1
 10
-3.0
+1.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-173
+198
 10
-237
+253
 43
 go
 repeat 100 [go]
@@ -162,24 +170,24 @@ NIL
 1
 
 SLIDER
-11
-111
-103
-144
+112
+61
+204
+94
 step-size
 step-size
 0
 10
-1.0
+8.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-84
+79
 10
-165
+134
 43
 go once
 go
@@ -194,37 +202,37 @@ NIL
 1
 
 CHOOSER
-11
-159
-149
-204
+7
+183
+230
+228
 type-of-walk
 type-of-walk
-"random" "correlated"
-1
+"random" "correlated" "teste-perception-resistance" "other-teste"
+3
 
 SLIDER
-11
-215
-183
-248
+24
+100
+196
+133
 std-dev
 std-dev
 0
 45
-35.0
+23.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-17
-285
-106
-318
-NIL
-save
+139
+10
+194
+43
+go 50
+repeat 50 [go]
 NIL
 1
 T
@@ -234,6 +242,38 @@ NIL
 NIL
 NIL
 1
+
+BUTTON
+57
+243
+151
+276
+save-path
+file-close
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+26
+142
+198
+175
+perceptual-range
+perceptual-range
+0
+10
+5.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
