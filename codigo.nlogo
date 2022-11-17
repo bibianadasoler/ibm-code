@@ -1,11 +1,14 @@
-patches-own ; traits that each patche has
+extensions [ palette ]
+
+patches-own ; traits each patche has
  [
-  resistance-value ; resistance value of each land cover class
+  target
+  resistance-value ; resistance value of each land cover class - PODE SER TROCADO PARA O COMPLEMENTO - PREFERENCIA
  ]
 turtles-own
  [
-  perception
-  y
+  perception ; value of perception of each individual
+  y ; temporario apenas para ver as rotacoes
  ]
 
 to setup
@@ -28,60 +31,48 @@ end
 
 to setup-landscape
   ask patches [
-    set resistance-value random 2 ; define the value for each patch
-    set pcolor resistance-value * 18 ; define the color according to the class - black = 0 free move ; pink = 1 no movement
+    set resistance-value random-float 1 ; define the value for each patch - choose a random number between 0 and 1
+    set resistance-value precision resistance-value 1 ; uma casa apos a virgula apenas
+    ;set plabel resistance-value
+    set pcolor palette:scale-gradient [[255 255 255] [0 0 0]] resistance-value 0 1; define the color according to resistance-value - gradiente de color entre preto e branco - white = 0 free move ; black = 1 no movement
   ]
 end
 
 to crt-ind ; to create individuals
-    create-turtles num-individuos [; num choosen in interface button
+ create-turtles num-individuos [; num choosen in interface button
       set shape "footprint other" ; change turtle shape
-      set perception random perceptual-range ; each individual has a particular perceptual-range
-      setxy random-pxcor random-pycor ; random position of individuals centered in the patch = ou random position at all? dai random-xcor
-      move-to one-of patches with [resistance-value = 0] ; nasce e vai para a classe de resistencia 0 depois registra a coord
+      set perception random perceptual-range + 1; each individual has a particular perceptual-range - random generates number from 0 to 9
+      move-to one-of patches with [resistance-value <= 0.2] ;turtles must be in any patch with resistance-value <= 0.2
       set xcor xcor
       set ycor ycor
       set size 1.5
-      set pen-mode "down" ; draw a line of turtle movement
+      set pen-mode "down"
+      set pen-size 1.5 ; draw a line of turtle movement
   ]
 end
 
 to move ; move based on the type-of-walk button
   ; random
-    if type-of-walk = "random" [
-    set heading random-float 360 ; head in a random direction ;;random-float any number from 0
-    ;fd step-size ; walk the distance of step-size
-      move-to one-of neighbors with [resistance-value = 0]  ; TENTATIVAS
-  ]
-  ; correlated
-    if type-of-walk = "correlated" [
-     set y random-normal 0 std-dev ; direction that is no more than X degrees off previous heading
-     print y ; apenas para ver o que acontece em cada rodada - voltar rt para random-normal 0 std-dev
-     rt y ; apenas para ver o que acontece em cada rodada - voltar rt para random-normal 0 std-dev
-     fd step-size ; walk the distance of step-size
+   if type-of-walk = "random" [
+      set y random-float 360 ; head in a random direction (any number from 0)
+      set heading y
+      ;fd step-size ; walk the distance of step-size
+      set target patches in-radius perception with-max [step-size - resistance-value] ;no raio valor da percepcao ve os patches com maior valor
+      ask target [ set pcolor blue ]
+      move-to one-of target
    ]
-  ; other types? levy!
-  if type-of-walk = "teste-perception-resistance" [
+  ; correlated
+  if type-of-walk = "correlated" [
     set y random-normal 0 std-dev ; direction that is no more than X degrees off previous heading
-     print y ; apenas para ver o que acontece em cada rodada - voltar rt para random-normal 0 std-dev
-     rt y ; apenas para ver o que acontece em cada rodada - voltar rt para random-normal 0 std-dev
-    if any? patches in-radius perceptual-range with [resistance-value = 0] [
-      move-to one-of patches in-radius step-size with [resistance-value = 0 and distance step-size] ; AQUI TA INDO PARA UM PATCH ALEATORIO DENTRO DO RAIO DO TAMANHO DE PASSO - MAS AS VEZES ANDA MENOS QUE O PASSO
-    ]
-  ]
-  if type-of-walk = "other-teste" [
-    set y random-normal 0 std-dev ; direction that is no more than X degrees off previous heading
-    print y ; apenas para ver o que acontece em cada rodada - voltar rt para random-normal 0 std-dev
-    rt y
-    ifelse any? ( patches with [resistance-value = 0] ) in-cone perceptual-range 180 [
-      ; ask patches in-cone perceptual-range 60 [ set pcolor red ]
-    ;  face one-of patches in-radius step-size with [resistance-value = 0]
-      forward step-size
-     ; move-to one-of patch-at-heading-and-distance y step-size
-    ]
-    ;ask turtles [ print patches with [resistance-value = 0] in-cone perceptual-range 180  ask ( patches with [resistance-value = 0] )in-cone perceptual-range 180 [ set pcolor red ] ]
-    [ print "NADA" ] ; se nao tiver patch ele nao anda
-  ]
+      print y ; apenas para ver o que acontece em cada rodada - voltar rt para random-normal 0 std-dev
+      rt y
+    ;wait 2 espera X tempo antes do proximo comando
+    set target patches in-radius perception with-max [step-size - resistance-value] ;no raio valor da percepcao ve os patches com maior valor
+    ask target [ set pcolor blue ]
+    move-to one-of target
+   ]
+  ; other types? desenvolver levy
+
 end
 
 
@@ -96,11 +87,11 @@ end
 GRAPHICS-WINDOW
 260
 10
-697
-448
+862
+613
 -1
 -1
-13.0
+18.0
 1
 10
 1
@@ -114,8 +105,8 @@ GRAPHICS-WINDOW
 16
 -16
 16
-0
-0
+1
+1
 1
 ticks
 30.0
@@ -178,7 +169,7 @@ step-size
 step-size
 0
 10
-8.0
+6.0
 1
 1
 NIL
@@ -208,8 +199,8 @@ CHOOSER
 228
 type-of-walk
 type-of-walk
-"random" "correlated" "teste-perception-resistance" "other-teste"
-3
+"random" "correlated"
+1
 
 SLIDER
 24
@@ -220,7 +211,7 @@ std-dev
 std-dev
 0
 45
-23.0
+4.0
 1
 1
 NIL
@@ -267,13 +258,23 @@ SLIDER
 175
 perceptual-range
 perceptual-range
-0
+1
 10
-5.0
+10.0
 1
 1
 NIL
 HORIZONTAL
+
+TEXTBOX
+31
+326
+235
+426
+O ANGULO NAO ESTA FUNCIONANDO!!!!!!!
+20
+15.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
