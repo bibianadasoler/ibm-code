@@ -72,6 +72,25 @@ to move ; move based on the type-of-walk button
     move-to one-of target
    ]
   ; other types? desenvolver levy
+;  to levy-walk
+;   set orient turning-angle-range 0 360
+;    set heading heading + one-of [-1 1] * orient
+;    set step power-law-dist 1 min-move-length scale-exp
+;    fd step
+;end
+
+;to-report turning-angle-range [ #min #max ]  ; function for determining the initial turning angle preceding any given move as a random floating number within a specified range
+;  report #min + random-float ( #max - #min ) ; calculates and reports range of turning angles for turtles to undertake during movement
+;end ; end of turning angle range calculation and reporting procedure
+
+;to-report power-law-dist [ #norm-const #min-step-length #scale-exp ] ; function defining a power law distribution for LW based on the normalization constant, the
+;  ; minimum step length and the scaling exponent of the distribution
+;  set scale-exp #scale-exp ; sets the scaling exponent of the power law distribution function to a randomly generated scaling exponent variable
+;  let randomizer random-float 1
+;  let min-step-length ( #norm-const * #min-step-length * ( 1 - randomizer ) ^ ( - 1 / #scale-exp )) ; calculates the minimum step length executed by LW subsidies from
+  ;the normalization constant, scaling exponent and minimum step length of the power law function
+;  report min-step-length ; produces the step length for the LW
+;end ; end of power-law distribution for calculation and reporting procedure for defining turtle LW step length
 
 end
 
