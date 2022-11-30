@@ -13,6 +13,8 @@ turtles-own
 
 to setup
   clear-all
+  resize-world 0 80 0 60
+  set-patch-size 10
   setup-landscape
   crt-ind ; create individuals
   reset-ticks
@@ -45,9 +47,9 @@ to crt-ind ; to create individuals
       move-to one-of patches with [resistance-value <= 0.2] ;turtles must be in any patch with resistance-value <= 0.2
       set xcor xcor
       set ycor ycor
-      set size 1.5
+      set size 3
       set pen-mode "down"
-      set pen-size 1.5 ; draw a line of turtle movement
+      set pen-size 2 ; draw a line of turtle movement
   ]
 end
 
@@ -58,7 +60,7 @@ to move ; move based on the type-of-walk button
       set heading y
       ;fd step-size ; walk the distance of step-size
       set target patches in-radius perception with-max [step-size - resistance-value] ;no raio valor da percepcao ve os patches com maior valor
-      ask target [ set pcolor blue ]
+   ;   ask target [ set pcolor blue ]
       move-to one-of target
    ]
   ; correlated
@@ -68,7 +70,7 @@ to move ; move based on the type-of-walk button
       rt y
     ;wait 2 espera X tempo antes do proximo comando
     set target patches in-radius perception with-max [step-size - resistance-value] ;no raio valor da percepcao ve os patches com maior valor
-    ask target [ set pcolor blue ]
+   ; ask target [ set pcolor blue ]
     move-to one-of target
    ]
   ; other types? desenvolver levy
@@ -106,11 +108,11 @@ end
 GRAPHICS-WINDOW
 260
 10
-862
-613
+1078
+629
 -1
 -1
-18.0
+10.0
 1
 10
 1
@@ -120,10 +122,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--16
-16
--16
-16
+0
+80
+0
+60
 1
 1
 1
@@ -156,7 +158,7 @@ num-individuos
 num-individuos
 1
 10
-1.0
+10.0
 1
 1
 NIL
@@ -219,7 +221,7 @@ CHOOSER
 type-of-walk
 type-of-walk
 "random" "correlated"
-1
+0
 
 SLIDER
 24
