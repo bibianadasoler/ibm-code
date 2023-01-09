@@ -1,20 +1,26 @@
 extensions [ palette ]
 
-patches-own ; traits each patche has
+globals [
+    move-probability ;
+ ]
+
+patches-own ; traits each patch has
  [
-  target
   resistance-value ; resistance value of each land cover class - PODE SER TROCADO PARA O COMPLEMENTO - PREFERENCIA
+  target; target patch to where the individual will move
+  actual-resistance ; resistance for each target in each tick
  ]
 turtles-own
  [
   perception ; value of perception of each individual
-  y ; temporario apenas para ver as rotacoes
+  direction ; the direction where the inidivual should move
+  step
  ]
 
 to setup
   clear-all
-  resize-world 0 80 0 60
-  set-patch-size 10
+  resize-world 0 16 0 12
+  set-patch-size 20
   setup-landscape
   crt-ind ; create individuals
   reset-ticks
@@ -25,7 +31,7 @@ end
 to go
   ask turtles
   [
-    move ; movement in each tick
+    move ; one movement in each tick
   ]
   tick
   save-coord ; save coordinates in each go tick
@@ -48,52 +54,47 @@ to crt-ind ; to create individuals
       set xcor xcor
       set ycor ycor
       set size 3
-      set pen-mode "down"
-      set pen-size 2 ; draw a line of turtle movement
+      set pen-mode "down"; to draw a line of turtle movement
+      set pen-size 2
   ]
 end
 
 to move ; move based on the type-of-walk button
   ; random
-   if type-of-walk = "random" [
-      set y random-float 360 ; head in a random direction (any number from 0)
-      set heading y
-      ;fd step-size ; walk the distance of step-size
-      set target patches in-radius perception with-max [step-size - resistance-value] ;no raio valor da percepcao ve os patches com maior valor
-   ;   ask target [ set pcolor blue ]
-      move-to one-of target
+   if type-of-walk = "random" [ ;NAO CONSIDERA A RESISTENCIA
+     ; set target patches in-radius perception ;with-max [maximum-step-length - resistance-value] ;no raio valor da percepcao ve os patches com maior valor
+     ; ask target [ set pcolor blue ]
+      set direction random-float 360 ; head in a random direction (any number from 0 to 360)
+      set step (maximum-step-length - resistance-value) ;trava quando a resistencia é 0, animal nao mexe mais
+       print step
+      move-to patch-at-heading-and-distance direction step
    ]
   ; correlated
   if type-of-walk = "correlated" [
-    set y random-normal 0 std-dev ; direction that is no more than X degrees off previous heading
-      print y ; apenas para ver o que acontece em cada rodada - voltar rt para random-normal 0 std-dev
-      rt y
-    ;wait 2 espera X tempo antes do proximo comando
-    set target patches in-radius perception with-max [step-size - resistance-value] ;no raio valor da percepcao ve os patches com maior valor
-   ; ask target [ set pcolor blue ]
-    move-to one-of target
+     set direction random-normal 0 std-dev ; direction that is no more than X degrees off previous heading
+      print direction ;APAGAR DEPOIS
+      rt direction ;APAGAR DEPOIS
+     set target patches in-radius perception
+     ask target [
+      ;set pcolor blue
+      set actual-resistance (maximum-step-length * resistance-value)
+      set plabel actual-resistance
+      set plabel-color red
+    ]
+     set step (maximum-step-length - resistance-value)
+      print step
+    ; if random-float 1 > 0.3 [ facexy [pxcor] of x [pycor] of y ] DICA INTERNET
+     ;move-to patch-right-and-ahead direction step
    ]
-  ; other types? desenvolver levy
-;  to levy-walk
-;   set orient turning-angle-range 0 360
-;    set heading heading + one-of [-1 1] * orient
-;    set step power-law-dist 1 min-move-length scale-exp
-;    fd step
-;end
-
-;to-report turning-angle-range [ #min #max ]  ; function for determining the initial turning angle preceding any given move as a random floating number within a specified range
-;  report #min + random-float ( #max - #min ) ; calculates and reports range of turning angles for turtles to undertake during movement
-;end ; end of turning angle range calculation and reporting procedure
-
-;to-report power-law-dist [ #norm-const #min-step-length #scale-exp ] ; function defining a power law distribution for LW based on the normalization constant, the
-;  ; minimum step length and the scaling exponent of the distribution
-;  set scale-exp #scale-exp ; sets the scaling exponent of the power law distribution function to a randomly generated scaling exponent variable
-;  let randomizer random-float 1
-;  let min-step-length ( #norm-const * #min-step-length * ( 1 - randomizer ) ^ ( - 1 / #scale-exp )) ; calculates the minimum step length executed by LW subsidies from
-  ;the normalization constant, scaling exponent and minimum step length of the power law function
-;  report min-step-length ; produces the step length for the LW
-;end ; end of power-law distribution for calculation and reporting procedure for defining turtle LW step length
-
+  ; other types? levy = 4.1 random walks sullivan perry 2013
+   if type-of-walk = "levy" [ ;NAO CONSIDERA A RESISTENCIA
+    set direction random-float 360
+    set step r-cauchy 0 1
+    set step (step - resistance-value)
+     print step
+    move-to patch-at-heading-and-distance direction step
+   ]
+ ;  set actual-resistance 0
 end
 
 
@@ -104,15 +105,20 @@ to save-coord ; NAO ESTA SALVANDO TICK 0 = COORDENADA INICIAL
     ]
   ]
 end
+
+to-report r-cauchy [loc scl] ; 4.1
+  let X (pi * (random-float 1)) ;; Netlogo tan takes degrees not radians
+  report loc + scl * tan(X * (180 / pi))
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 260
 10
-1078
-629
+608
+279
 -1
 -1
-10.0
+20.0
 1
 10
 1
@@ -123,9 +129,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-80
+16
 0
-60
+12
 1
 1
 1
@@ -158,7 +164,7 @@ num-individuos
 num-individuos
 1
 10
-10.0
+1.0
 1
 1
 NIL
@@ -184,13 +190,13 @@ NIL
 SLIDER
 112
 61
-204
+249
 94
-step-size
-step-size
+maximum-step-length
+maximum-step-length
 0
 10
-6.0
+2.0
 1
 1
 NIL
@@ -220,8 +226,8 @@ CHOOSER
 228
 type-of-walk
 type-of-walk
-"random" "correlated"
-0
+"random" "correlated" "levy"
+1
 
 SLIDER
 24
@@ -230,7 +236,7 @@ SLIDER
 133
 std-dev
 std-dev
-0
+1
 45
 4.0
 1
@@ -280,22 +286,12 @@ SLIDER
 perceptual-range
 perceptual-range
 1
-10
-10.0
+50
+8.0
 1
 1
 NIL
 HORIZONTAL
-
-TEXTBOX
-31
-326
-235
-426
-O ANGULO NAO ESTA FUNCIONANDO!!!!!!!
-20
-15.0
-1
 
 @#$#@#$#@
 ## WHAT IS IT?
