@@ -1,98 +1,93 @@
-extensions [ palette ]
+extensions [ gis rnd ]
 
 globals [
-    move-probability ;
+  move-probability ;
+  resolution ; pixel resolution
+  landscape ;landscape of your study area
  ]
 
 patches-own ; traits each patch has
  [
-  resistance-value ; resistance value of each land cover class - PODE SER TROCADO PARA O COMPLEMENTO - PREFERENCIA
-  target; target patch to where the individual will move
-  actual-resistance ; resistance for each target in each tick
+  permeability-value ; permeability value of each land cover class
+  times-used ; a variable to record how many times each patch was used - BY EACH INDIVIDUAL OR GENERAL?
  ]
 turtles-own
  [
-  perception ; value of perception of each individual
-  direction ; the direction where the inidivual should move
-  step
+  ;direction ; the direction where the inidivual should move
+  ;step
  ]
 
 to setup
   clear-all
-  resize-world 0 16 0 12
-  set-patch-size 20
-  setup-landscape
-  crt-ind ; create individuals
+  setup-landscape ; see the procedure below
+  create-individuals ; see the procedure below
   reset-ticks
   carefully [ file-delete "coordinates.txt" ] [ ] ; check if there is a file with this name and remove it
   file-open "coordinates.txt" ; create a txt file to store the coordinates
 end
 
-to go
+to setup-landscape ; settings of the landscape that will be imported
+  set landscape gis:load-dataset "/Users/bibianaterra/OneDrive/Doutorado/Predicao_ferrovias/Exemplos_codigo_NetLogo/small_mammal_dispersal_model-master/landscapes/exported_ascii_MS_HABMAT_2PIX_TREES_DIST/simulation_000001_p029_h059_HABMAT_trees_2pix_edge_dist_modified.asc" ; loading landscape - choose the .asc file with permeability values
+  gis:apply-raster landscape permeability-value ; get the values from the landscape to the variable permeability-value
+  ;;;;;;;;;;;;;;;;;;;;;;
+  ; ARRUMAR ESSA PARTE DAS CORES
+  ask patches with [ permeability-value >= 0 and permeability-value <= 10 ] [ set pcolor white ] ; classe Rocky outcrop #29
+  ask patches with [ permeability-value > 10 and permeability-value <= 90 ] [ set pcolor black ] ; varias
+  ask patches with [ permeability-value > 90 ] [ set pcolor green ] ; Forest formation
+  ask patches [ if permeability-value <= 0 [ set permeability-value 1] ]
+  ;;;;;;;;;;;;;;;;;;;;;;
+end
+
+to create-individuals ; to create individuals
+ create-turtles num-individuals [; num choosen in interface button
+    set shape "footprint other" ; define individual shape
+    move-to one-of patches with [permeability-value > 90] ; individuals must born in any patch with permeability-value XXXX where they move easier
+    ;;;;;;;;;;;;;;;;;;; PENSAR SE ISSO PRECISA
+    set xcor xcor
+    set ycor ycor
+    ;;;;;;;;;;;;;;;;;;;
+    set size 10 ; define individual size
+    set pen-mode "down" ; draw a line of inidividual movement
+    set pen-size 2
+    ; definir o local de nascimento como centro do home range (?)
+  ]
+end
+
+to go ; what individuals will do when we click in the button go
   ask turtles
   [
-    move ; one movement in each tick
+    move ; see the procedure below
   ]
+  ;;;;;;;;;;; DESENVOLVER ESSA PARTE
+  ; update patch color based in the times-used variable
+  ;;;;;;;;;;;
   tick
-  save-coord ; save coordinates in each go tick
-end
-
-to setup-landscape
-  ask patches [
-    set resistance-value random-float 1 ; define the value for each patch - choose a random number between 0 and 1
-    set resistance-value precision resistance-value 1 ; uma casa apos a virgula apenas
-    ;set plabel resistance-value
-    set pcolor palette:scale-gradient [[255 255 255] [0 0 0]] resistance-value 0 1; define the color according to resistance-value - gradiente de color entre preto e branco - white = 0 free move ; black = 1 no movement
-  ]
-end
-
-to crt-ind ; to create individuals
- create-turtles num-individuos [; num choosen in interface button
-      set shape "footprint other" ; change turtle shape
-      set perception random perceptual-range + 1; each individual has a particular perceptual-range - random generates number from 0 to 9
-      move-to one-of patches with [resistance-value <= 0.2] ;turtles must be in any patch with resistance-value <= 0.2
-      set xcor xcor
-      set ycor ycor
-      set size 3
-      set pen-mode "down"; to draw a line of turtle movement
-      set pen-size 2
-  ]
+  ; AINDA QUEREMOS ISSO?
+  save-coord ; save coordinates in each go tick to have the trajectory of each individual
 end
 
 to move ; move based on the type-of-walk button
-  ; random
-   if type-of-walk = "random" [ ;NAO CONSIDERA A RESISTENCIA
-     ; set target patches in-radius perception ;with-max [maximum-step-length - resistance-value] ;no raio valor da percepcao ve os patches com maior valor
-     ; ask target [ set pcolor blue ]
-      set direction random-float 360 ; head in a random direction (any number from 0 to 360)
-      set step (maximum-step-length - resistance-value) ;trava quando a resistencia é 0, animal nao mexe mais
-       print step
-      move-to patch-at-heading-and-distance direction step
+  ; vou viajar ou voltar pra casa?? qual a minha distancia ao centro do home range, se o numero aleatorio
+  ; se vou viajar faz ; correlated - vai pra algum patch dentro do cone de tamanho do angulo SE USAR 360 EH RANDOM
+  if type-of-walk = "correlated" [ ; individual next step will be related to the previous one
+    let targets patches in-cone maximum-step-length mean-angle ; all patches inside the cone with radius of maximum-step-length and opening based on the mean-angle
+    ask targets [ set pcolor red ]
+    let chosen-patch rnd:weighted-one-of targets [ permeability-value ] ; choose a random patch to move with the probability of being chosen proportional to the weight of permeability-value
+    ask chosen-patch [set pcolor white ]
+    face chosen-patch ; individual faces the target patch to change its direction
+    move-to chosen-patch ; move to the chosen-patch
+    ask chosen-patch [ set times-used times-used + 1 ] ; when a patch is chosen, add 1 to times-used variable
    ]
-  ; correlated
-  if type-of-walk = "correlated" [
-     set direction random-normal 0 std-dev ; direction that is no more than X degrees off previous heading
-      print direction ;APAGAR DEPOIS
-      rt direction ;APAGAR DEPOIS
-     set target patches in-radius perception
-     ask target [
-      ;set pcolor blue
-      set actual-resistance (maximum-step-length * resistance-value)
-      set plabel actual-resistance
-      set plabel-color red
-    ]
-     set step (maximum-step-length - resistance-value)
-      print step
-    ; if random-float 1 > 0.3 [ facexy [pxcor] of x [pycor] of y ] DICA INTERNET
-     ;move-to patch-right-and-ahead direction step
-   ]
+; se foe voltar pra casa - primeiro face a origem e depois ver os targets
+
+
   ; other types? levy = 4.1 random walks sullivan perry 2013
    if type-of-walk = "levy" [ ;NAO CONSIDERA A RESISTENCIA
-    set direction random-float 360
-    set step r-cauchy 0 1
-    set step (step - resistance-value)
-     print step
-    move-to patch-at-heading-and-distance direction step
+    ;set direction random-float 360
+    ;set step r-cauchy 0 1
+    ;;set step (step - permeability-value)
+    ; print step
+   ; move-to patch-at-heading-and-distance direction step
    ]
  ;  set actual-resistance 0
 end
@@ -112,13 +107,13 @@ to-report r-cauchy [loc scl] ; 4.1
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-260
+277
 10
-608
-279
+808
+542
 -1
 -1
-20.0
+2.03502
 1
 10
 1
@@ -128,10 +123,10 @@ GRAPHICS-WINDOW
 1
 1
 1
-0
-16
-0
-12
+-128
+128
+-128
+128
 1
 1
 1
@@ -156,15 +151,15 @@ NIL
 1
 
 SLIDER
-11
-61
-103
-94
-num-individuos
-num-individuos
+51
+56
+190
+89
+num-individuals
+num-individuals
 1
 10
-1.0
+10.0
 1
 1
 NIL
@@ -177,7 +172,7 @@ BUTTON
 43
 go
 repeat 100 [go]
-NIL
+T
 1
 T
 OBSERVER
@@ -188,15 +183,15 @@ NIL
 1
 
 SLIDER
-112
-61
-249
-94
+53
+95
+211
+128
 maximum-step-length
 maximum-step-length
 0
 10
-2.0
+10.0
 1
 1
 NIL
@@ -220,29 +215,14 @@ NIL
 1
 
 CHOOSER
-7
-183
-230
-228
+11
+215
+234
+260
 type-of-walk
 type-of-walk
-"random" "correlated" "levy"
-1
-
-SLIDER
-24
-100
-196
-133
-std-dev
-std-dev
-1
-45
-4.0
-1
-1
-NIL
-HORIZONTAL
+"correlated" "levy"
+0
 
 BUTTON
 139
@@ -262,10 +242,10 @@ NIL
 1
 
 BUTTON
-57
-243
-151
-276
+68
+271
+162
+304
 save-path
 file-close
 NIL
@@ -278,20 +258,16 @@ NIL
 NIL
 1
 
-SLIDER
-26
+INPUTBOX
+11
 142
-198
-175
-perceptual-range
-perceptual-range
+88
+202
+mean-angle
+180.0
 1
-50
-8.0
-1
-1
-NIL
-HORIZONTAL
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -305,6 +281,9 @@ HORIZONTAL
 ## HOW TO USE IT
 
 (how to use the model, including a description of each of the items in the Interface tab)
+There are three types of walk available in this model. 
+Random - to use this one you should chose the "correlated" option and must define the mean-angle as 360, this way the individual can move to anywhere inside a circle.
+Correlated - the individiual next step will be related to the previous one, so it will move to a patch inside a cone with the size defined by the mean angle
 
 ## THINGS TO NOTICE
 
@@ -648,7 +627,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.1
+NetLogo 6.3.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
