@@ -1,15 +1,13 @@
-extensions [ gis rnd ]
+extensions [ gis rnd ] ; gis extension is necessary to load the landscape and rnd is being used to consider the permeability value of the patches to where the individuals will move
 
 globals [
-  move-probability ;
-  resolution ; pixel resolution
   landscape ;landscape of your study area
+  roads ; roads of your study area ?????
  ]
 
-patches-own ; traits each patch has
+patches-own
  [
   permeability-value ; permeability value of each land cover class
-  times-used ; a variable to record how many times each patch was used - BY EACH INDIVIDUAL OR GENERAL?
  ]
 turtles-own
  [
@@ -22,61 +20,55 @@ to setup
   setup-landscape ; see the procedure below
   create-individuals ; see the procedure below
   reset-ticks
-  carefully [ file-delete "coordinates.txt" ] [ ] ; check if there is a file with this name and remove it
-  file-open "coordinates.txt" ; create a txt file to store the coordinates
+
 end
 
-to setup-landscape ; settings of the landscape that will be imported
-  set landscape gis:load-dataset "/Users/bibianaterra/OneDrive/Doutorado/Predicao_ferrovias/Exemplos_codigo_NetLogo/small_mammal_dispersal_model-master/landscapes/exported_ascii_MS_HABMAT_2PIX_TREES_DIST/simulation_000001_p029_h059_HABMAT_trees_2pix_edge_dist_modified.asc" ; loading landscape - choose the .asc file with permeability values
+to setup-landscape ; settings of the landscape that will be load
+  set landscape gis:load-dataset "/Users/bibianaterra/OneDrive/Doutorado/Predicao_ferrovias/ibm-code/ibm-code/landscape_netlogo_telemetria.asc" ; loading landscape - choose the .asc file with permeability values
+  resize-world 0 gis:width-of landscape 0 gis:height-of landscape
+ ; gis:set-world-envelope-ds gis:envelope-of landscape ;define the world size similar to the landscape imported
   gis:apply-raster landscape permeability-value ; get the values from the landscape to the variable permeability-value
-  ;;;;;;;;;;;;;;;;;;;;;;
-  ; ARRUMAR ESSA PARTE DAS CORES
-  ask patches with [ permeability-value >= 0 and permeability-value <= 10 ] [ set pcolor white ] ; classe Rocky outcrop #29
-  ask patches with [ permeability-value > 10 and permeability-value <= 90 ] [ set pcolor black ] ; varias
-  ask patches with [ permeability-value > 90 ] [ set pcolor green ] ; Forest formation
-  ask patches [ if permeability-value <= 0 [ set permeability-value 1] ]
-  ;;;;;;;;;;;;;;;;;;;;;;
+  ask patches [ set permeability-value round permeability-value ] ; round the permeability value
+  ask patches [ set pcolor scale-color green permeability-value 100.0 1.0 ] ; define the patch color due to its permeability value
+
 end
 
 to create-individuals ; to create individuals
  create-turtles num-individuals [; num choosen in interface button
     set shape "footprint other" ; define individual shape
-    move-to one-of patches with [permeability-value > 90] ; individuals must born in any patch with permeability-value XXXX where they move easier
-    ;;;;;;;;;;;;;;;;;;; PENSAR SE ISSO PRECISA
-    set xcor xcor
-    set ycor ycor
-    ;;;;;;;;;;;;;;;;;;;
-    set size 10 ; define individual size
+    set color black
+    move-to rnd:weighted-one-of patches [ permeability-value ] ; ONDE QUEREMOS QUE ELES SURJAM?
+    set size 2 ; define individual size
     set pen-mode "down" ; draw a line of inidividual movement
-    set pen-size 2
+    set pen-size 0.5
     ; definir o local de nascimento como centro do home range (?)
   ]
 end
 
 to go ; what individuals will do when we click in the button go
-  ask turtles
-  [
-    move ; see the procedure below
-  ]
-  ;;;;;;;;;;; DESENVOLVER ESSA PARTE
-  ; update patch color based in the times-used variable
-  ;;;;;;;;;;;
+  ask turtles [ move ]; see the procedure below
   tick
-  ; AINDA QUEREMOS ISSO?
   save-coord ; save coordinates in each go tick to have the trajectory of each individual
 end
 
 to move ; move based on the type-of-walk button
   ; vou viajar ou voltar pra casa?? qual a minha distancia ao centro do home range, se o numero aleatorio
   ; se vou viajar faz ; correlated - vai pra algum patch dentro do cone de tamanho do angulo SE USAR 360 EH RANDOM
+  if type-of-walk = "homogeneous random" [ ; individual next step will be related to the previous one
+   let targets patches in-radius step-length ; all patches inside a circle with radius of step-length are targets
+    let chosen-patch one-of targets ; choose a random patch to move
+    move-to chosen-patch ; move to the chosen-patch
+   ]
+  if type-of-walk = "heterogeneous random" [ ; individual next step will be related to the previous one
+    let targets patches in-radius step-length ; all patches inside a circle with radius of step-length are targets
+    let chosen-patch rnd:weighted-one-of targets [ permeability-value ] ; (random selection by weight: higher values stands a greater chance of being picked) choose a random patch to move with the probability of being chosen proportional to the weight of permeability-value
+    move-to chosen-patch ; move to the chosen-patch
+   ]
   if type-of-walk = "correlated" [ ; individual next step will be related to the previous one
-    let targets patches in-cone maximum-step-length mean-angle ; all patches inside the cone with radius of maximum-step-length and opening based on the mean-angle
-    ask targets [ set pcolor red ]
-    let chosen-patch rnd:weighted-one-of targets [ permeability-value ] ; choose a random patch to move with the probability of being chosen proportional to the weight of permeability-value
-    ask chosen-patch [set pcolor white ]
+    let targets patches in-cone step-length mean-angle ; all patches inside the cone with radius of maximum-step-length and opening based on the mean-angle are targets
+    let chosen-patch rnd:weighted-one-of targets [ permeability-value ] ; (random selection by weight: higher values stands a greater chance of being picked) choose a random patch to move with the probability of being chosen proportional to the weight of permeability-value
     face chosen-patch ; individual faces the target patch to change its direction
     move-to chosen-patch ; move to the chosen-patch
-    ask chosen-patch [ set times-used times-used + 1 ] ; when a patch is chosen, add 1 to times-used variable
    ]
 ; se foe voltar pra casa - primeiro face a origem e depois ver os targets
 
@@ -93,11 +85,14 @@ to move ; move based on the type-of-walk button
 end
 
 
-to save-coord ; NAO ESTA SALVANDO TICK 0 = COORDENADA INICIAL
-  foreach sort turtles [ ind ->
-    ask ind [
-      file-print (word who "," xcor "," ycor "," ticks) ; store in the txt file the columns: which individual, its x and y coordinates and which tick
-    ]
+to save-coord
+  carefully [ file-delete "coordinates.txt" ] [ ] ; check if there is a file with this name and if so, remove it
+  file-open "coordinates.txt" ; create a txt file to store the coordinates
+  ask turtles [
+    let coords gis:envelope-of self
+    let x first coords
+    let y last coords
+    file-print (word who "," x "," y "," ticks) ; save individual number, x, y and tick number
   ]
 end
 
@@ -109,11 +104,11 @@ end
 GRAPHICS-WINDOW
 277
 10
-808
-542
+1302
+382
 -1
 -1
-2.03502
+0.5
 1
 10
 1
@@ -123,10 +118,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--128
-128
--128
-128
+0
+2034
+0
+726
 1
 1
 1
@@ -158,8 +153,8 @@ SLIDER
 num-individuals
 num-individuals
 1
-10
-10.0
+100
+5.0
 1
 1
 NIL
@@ -185,13 +180,13 @@ NIL
 SLIDER
 53
 95
-211
+225
 128
-maximum-step-length
-maximum-step-length
+step-length
+step-length
 0
 10
-10.0
+5.0
 1
 1
 NIL
@@ -217,12 +212,12 @@ NIL
 CHOOSER
 11
 215
-234
+235
 260
 type-of-walk
 type-of-walk
-"correlated" "levy"
-0
+"homogeneous random" "heterogeneous random" "correlated" "levy"
+2
 
 BUTTON
 139
