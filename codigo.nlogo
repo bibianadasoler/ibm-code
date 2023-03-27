@@ -1,4 +1,4 @@
-extensions [ gis rnd ] ; gis extension is necessary to load the landscape and rnd is being used to consider the permeability value of the patches to where the individuals will move
+extensions [ gis rnd  ]
 
 globals [
   landscape ;landscape of your study area
@@ -9,24 +9,22 @@ patches-own
  [
   permeability-value ; permeability value of each land cover class
  ]
-turtles-own
- [
-  ;direction ; the direction where the inidivual should move
-  ;step
- ]
 
 to setup
   clear-all
   setup-landscape ; see the procedure below
   create-individuals ; see the procedure below
+  carefully [ file-delete "coordinates.txt" ] [ ] ; check if there is a file with this name and if so, remove it
+  file-open "coordinates.txt" ; create a txt file to store the coordinates
+
   reset-ticks
 
 end
 
 to setup-landscape ; settings of the landscape that will be load
-  set landscape gis:load-dataset "/Users/bibianaterra/OneDrive/Doutorado/Predicao_ferrovias/ibm-code/ibm-code/landscape_netlogo_telemetria.asc" ; loading landscape - choose the .asc file with permeability values
+  set landscape gis:load-dataset "/Users/bibianaterra/OneDrive/Doutorado/Predicao_ferrovias/ibm-code/area_pequena.asc" ; loading landscape - choose the .asc file with permeability values
   resize-world 0 gis:width-of landscape 0 gis:height-of landscape
- ; gis:set-world-envelope-ds gis:envelope-of landscape ;define the world size similar to the landscape imported
+  gis:set-world-envelope-ds gis:envelope-of landscape ;define the world size similar to the landscape imported
   gis:apply-raster landscape permeability-value ; get the values from the landscape to the variable permeability-value
   ask patches [ set permeability-value round permeability-value ] ; round the permeability value
   ask patches [ set pcolor scale-color green permeability-value 100.0 1.0 ] ; define the patch color due to its permeability value
@@ -37,57 +35,57 @@ to create-individuals ; to create individuals
  create-turtles num-individuals [; num choosen in interface button
     set shape "footprint other" ; define individual shape
     set color black
-    move-to rnd:weighted-one-of patches [ permeability-value ] ; ONDE QUEREMOS QUE ELES SURJAM?
+    move-to rnd:weighted-one-of patches [ permeability-value ] ; individuals are born in a random selection by weight
     set size 2 ; define individual size
     set pen-mode "down" ; draw a line of inidividual movement
     set pen-size 0.5
-    ; definir o local de nascimento como centro do home range (?)
   ]
 end
 
 to go ; what individuals will do when we click in the button go
   ask turtles [ move ]; see the procedure below
+
   tick
   save-coord ; save coordinates in each go tick to have the trajectory of each individual
 end
 
 to move ; move based on the type-of-walk button
-  ; vou viajar ou voltar pra casa?? qual a minha distancia ao centro do home range, se o numero aleatorio
-  ; se vou viajar faz ; correlated - vai pra algum patch dentro do cone de tamanho do angulo SE USAR 360 EH RANDOM
   if type-of-walk = "homogeneous random" [ ; individual next step will be related to the previous one
-   let targets patches in-radius step-length ; all patches inside a circle with radius of step-length are targets
+    let step-length random-gamma  mean-step sd-step
+    print step-length
+    let targets patches in-radius step-length ; all patches inside a circle with radius of step-length are targets
     let chosen-patch one-of targets ; choose a random patch to move
     move-to chosen-patch ; move to the chosen-patch
    ]
   if type-of-walk = "heterogeneous random" [ ; individual next step will be related to the previous one
+    let step-length random-gamma  mean-step sd-step
+    print step-length
     let targets patches in-radius step-length ; all patches inside a circle with radius of step-length are targets
     let chosen-patch rnd:weighted-one-of targets [ permeability-value ] ; (random selection by weight: higher values stands a greater chance of being picked) choose a random patch to move with the probability of being chosen proportional to the weight of permeability-value
     move-to chosen-patch ; move to the chosen-patch
    ]
   if type-of-walk = "correlated" [ ; individual next step will be related to the previous one
-    let targets patches in-cone step-length mean-angle ; all patches inside the cone with radius of maximum-step-length and opening based on the mean-angle are targets
+    let step-length random-gamma  mean-step sd-step
+    ;set step-length 3;step-length * 3.67
+    print step-length
+    ;let angle rngs:rnd-vm mean-angle concentration-angle ;rngs:rnd-vm
+    let angle one-of [ 1.1963653300773 5.47554984003312 2.1450604782467 5.86962408104768  6.17951818541185 5.69250917877977 1.47706168239137 1.00878899735074 4.8863545387396 5.84586414379411 0.807437885399752 6.1376292874791 0.109030315911556 3.27752748838459 2.63927350577431 0.06579293774923 ]
+    print angle
+    let targets patches in-cone step-length angle ; all patches inside the cone with radius of maximum-step-length and opening based on the mean-angle are targets
+    ;set targets  [remove-item targets patch-here]
+   ; set targets filter  targets != patch-here targets
+    ask targets [ set pcolor red]
     let chosen-patch rnd:weighted-one-of targets [ permeability-value ] ; (random selection by weight: higher values stands a greater chance of being picked) choose a random patch to move with the probability of being chosen proportional to the weight of permeability-value
     face chosen-patch ; individual faces the target patch to change its direction
     move-to chosen-patch ; move to the chosen-patch
    ]
-; se foe voltar pra casa - primeiro face a origem e depois ver os targets
-
-
   ; other types? levy = 4.1 random walks sullivan perry 2013
-   if type-of-walk = "levy" [ ;NAO CONSIDERA A RESISTENCIA
-    ;set direction random-float 360
-    ;set step r-cauchy 0 1
-    ;;set step (step - permeability-value)
-    ; print step
-   ; move-to patch-at-heading-and-distance direction step
+   if type-of-walk = "levy" [
    ]
- ;  set actual-resistance 0
 end
 
 
 to save-coord
-  carefully [ file-delete "coordinates.txt" ] [ ] ; check if there is a file with this name and if so, remove it
-  file-open "coordinates.txt" ; create a txt file to store the coordinates
   ask turtles [
     let coords gis:envelope-of self
     let x first coords
@@ -98,17 +96,17 @@ end
 
 to-report r-cauchy [loc scl] ; 4.1
   let X (pi * (random-float 1)) ;; Netlogo tan takes degrees not radians
-  report loc + scl * tan(X * (180 / pi))
+  report abs (loc + scl * tan(X * (180 / pi))) ;PS COLOQUEI UM ABS
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
 277
 10
-1302
-382
+729
+577
 -1
 -1
-0.5
+6.0
 1
 10
 1
@@ -119,9 +117,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-2034
+73
 0
-726
+92
 1
 1
 1
@@ -154,7 +152,7 @@ num-individuals
 num-individuals
 1
 100
-5.0
+17.0
 1
 1
 NIL
@@ -177,21 +175,6 @@ NIL
 NIL
 1
 
-SLIDER
-53
-95
-225
-128
-step-length
-step-length
-0
-10
-5.0
-1
-1
-NIL
-HORIZONTAL
-
 BUTTON
 79
 10
@@ -210,10 +193,10 @@ NIL
 1
 
 CHOOSER
-11
-215
-235
-260
+14
+234
+238
+279
 type-of-walk
 type-of-walk
 "homogeneous random" "heterogeneous random" "correlated" "levy"
@@ -237,11 +220,11 @@ NIL
 1
 
 BUTTON
-68
-271
-162
-304
-save-path
+71
+290
+181
+323
+save-coords
 file-close
 NIL
 1
@@ -254,12 +237,45 @@ NIL
 1
 
 INPUTBOX
-11
-142
-88
-202
+35
+159
+112
+219
 mean-angle
-180.0
+0.0
+1
+0
+Number
+
+INPUTBOX
+30
+93
+113
+153
+mean-step
+0.11
+1
+0
+Number
+
+INPUTBOX
+116
+93
+205
+153
+sd-step
+0.07
+1
+0
+Number
+
+INPUTBOX
+117
+158
+215
+218
+concentration-angle
+0.0
 1
 0
 Number
