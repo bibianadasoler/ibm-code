@@ -1,7 +1,7 @@
 # movement parameters - step size and turning angle
 # based on Statistical Methods Series: Movement Ecology - Theo Michelot momentuHMM 
 
-# Packages ----
+# Packages and functions----
 library(dplyr)
 library(stringr)
 library(ggplot2)
@@ -9,6 +9,7 @@ library(sf)
 library(sp)
 library(adehabitatLT)
 library(momentuHMM)
+source("tutorial_momentuHMM_utility_functions.R")
 
 # Importing and organizing data ----
 # importando os dados da telemetria e selecionando registros de interesse
@@ -22,8 +23,13 @@ library(momentuHMM)
 # salvando os dados selecionados
 #write.table(telemetria, "gps_data_filtered.txt", row.names = F)
 
-telemetria <- read.csv("gps_data_filtered.csv") %>%
-  mutate(time = as.POSIXct(time, format = "%Y-%m-%d %H:%M:%S", tz = "America/New_York"))
+telemetria <- read.csv("gps_data_filtered.csv") %>% 
+  mutate(time = as.POSIXct(time, format = "%Y-%m-%d %H:%M:%S", tz = "America/New_York")) %>%
+  group_by(ID) %>%
+  mutate(diff = c(0, diff(time))) %>%
+  filter(diff <= 0 | diff >= 18) %>% # remove records obtained in a time interval < 18 min, but 0 is kept to mantain the first record
+  dplyr::select(ID, GPS.Longitude, GPS.Latitude, time, ID2)
+
 #visualizing data
 telemetria %>%
   filter(ID == "Ben") %>%
@@ -45,23 +51,23 @@ ggplot(., aes(x, y, col = ID)) +
   geom_point(size = 0.1) + geom_path(linewidth = 0.1) +
   coord_equal()
 
-# Table of time intervals in data
-plot(table(diff(telemetria$time)), 
-     xlab = "time interval (min)", ylab = "count")
-
-
 # Use function from utility_function.R to split data at gaps 1 hour
-telemetria_split <- split_at_gap(data = telemetria, max_gap = 60, shortest_track = 60)
+telemetria_split <-  split_at_gap(data = telemetria, max_gap = 60, shortest_track = 60)
+
+telemetria_split %>%
+  group_by(ID) %>%
+  mutate(diff = c(0, diff(time))) %>%
+  with(., (table(diff)))
 
 # visualizing
 telemetria %>%
-  filter(ID == "Alexander") %>%
+  filter(ID == "Ben") %>%
   ggplot(., aes(x, y, col = ID)) + 
   geom_point(size = 0.1) + geom_path(linewidth = 0.1) + theme(legend.position="none") +
   coord_equal()
 
 telemetria_split %>%
-  filter(str_detect(ID, "Alexander")) %>%
+  filter(str_detect(ID, "Ben")) %>%
   ggplot(., aes(x, y, col = ID)) + 
   geom_point(size = 0.1) + geom_path(linewidth = 0.1) + theme(legend.position="none") +
   coord_equal()
@@ -78,28 +84,22 @@ telemetria_na <- ld(telemetria_adehabitat)[, c("id", "x", "y", "date")]
 colnames(telemetria_na) <- c("ID", "x", "y", "time")
 
 # Prepare data for HMM (compute step lengths and turning angles)
-telemetria_hmm1 <-prepData(telemetria_na, type = "UTM")
+telemetria_hmm <-prepData(telemetria_na, type = "UTM")
 
-head(telemetria_hmm1, 10)
-summary(telemetria_hmm1)
+head(telemetria_hmm, 10)
 
 # step length 
-hist(telemetria_hmm1$step, breaks = 100, xlim = c(0, 0.1))
+hist(telemetria_hmm$step, breaks = 100, xlim = c(0, 1000))
 
-alexander <- telemetria_hmm1 %>%
-  filter(str_detect(ID, "Alexander"),
-         step >= 0.2) # %>%
+telemetria_hmm %>%
+  filter(str_detect(ID, "Annie"),
+         step >= 20)  %>%
   ggplot(., aes(x, y, col = ID)) + 
   geom_point(size = 0.1) + geom_path(linewidth = 0.1) + theme(legend.position="none") +
   coord_equal()
 
-alexander_HMM2 <- fitHMM(alexander, nbStates = 2, dist = dist, Par0 = Par0_2s_alex)
-Par0_2s_alex <- list(step = c(0.05, 0.2, 0.05, 0.2), angle = c(0.1, 3))
-  
-head(telemetria_hmm1)
 # turning angle
-hist(telemetria_hmm1$angle, breaks = seq(-pi, pi, length = 15))
-plot.edf(telemetria_hmm1$angle)
+hist(telemetria_hmm$angle, breaks = seq(-pi, pi, length = 15))
 
 # Observation distributions (step lengths and turning angles)
 dist <- list(step = "gamma", angle = "vm")
@@ -111,22 +111,24 @@ dist <- list(step = "gamma", angle = "vm")
 # We would not expect any other value than 0 or π for the mean turning angle.
 # We usually expect the concentration to be larger in the state with larger step lengths
 # (step mean 1, step mean 2, step SD 1, step SD 2, zero-mass 1, zero-mass 2) and (angle concentration 1, angle concentration 2)
-Par0_2s <- list(step = c(0.05, 0.2, 0.05, 0.2, 0, 0), angle = c(0.1, 3))
-Par0_3s <- list(step = c(0.02, 0.1, 0.3, 0.02, 0.1, 0.3, 0, 0, 0), 
+Par_2s <- list(step = c(50, 200, 50, 200, 0, 0), angle = c(0.1, 3))
+Par_3s <- list(step = c(20, 100, 300, 20, 100, 300, 0, 0, 0), 
                 angle = c(0.01, 0.1, 3))
 
 # Fit a 2-state HMM
-hmm1_tamandua <- fitHMM(telemetria_hmm1, nbStates = 2, dist = dist, Par0 = Par0_2s)
-hmm2_tamandua <- fitHMM(telemetria_hmm1, nbStates = 3, dist = dist, Par0 = Par0_3s)
+hmm2s_tamandua <- fitHMM(telemetria_hmm, nbStates = 2, dist = dist, Par0 = Par_2s)
+hmm3s_tamandua <- fitHMM(telemetria_hmm, nbStates = 3, dist = dist, Par0 = Par_3s)
 
 # Print parameter estimates
-hmm1_tamandua
-hmm2_tamandua
+hmm2s_tamandua
+hmm3s_tamandua
 
 # Plot estimated distributions and state-coloured tracks
-plot(hmm1_tamandua, breaks = 25, ask = FALSE)
-plot(hmm1_tamandua, animals = "Alexander-1", breaks = 25, ask = FALSE)
+plot_hmm2s <- plot(hmm2s_tamandua, breaks = 25, ask = FALSE)
+alex1 <- plot(hmm2s_tamandua, animals = "Alexander-1", breaks = 25, ask = FALSE)
+plot_hmm3s <- plot(hmm3s_tamandua, breaks = 25, ask = FALSE)
 
 # Plot pseudo-residuals for 2-state and 3-state models
-plotPR(hmm1_tamandua)
+PRhmm2s <- plotPR(hmm2s_tamandua)
+PRhmm3s <- plotPR(hmm3s_tamandua)
 
