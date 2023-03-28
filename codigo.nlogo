@@ -2,7 +2,7 @@ extensions [ gis rnd  ]
 
 globals [
   landscape ;landscape of your study area
-  roads ; roads of your study area ?????
+  roads ; roads of your study area ; PARA ADICIONAR QUANDO COLOCARMOS OS CENARIOS
  ]
 
 patches-own
@@ -55,13 +55,6 @@ to move ; move based on the type-of-walk button
     print step-length
     let targets patches in-radius step-length ; all patches inside a circle with radius of step-length are targets
     let chosen-patch one-of targets ; choose a random patch to move
-    move-to chosen-patch ; move to the chosen-patch
-   ]
-  if type-of-walk = "heterogeneous random" [ ; individual next step will be related to the previous one
-    let step-length random-gamma  mean-step sd-step
-    print step-length
-    let targets patches in-radius step-length ; all patches inside a circle with radius of step-length are targets
-    let chosen-patch rnd:weighted-one-of targets [ permeability-value ] ; (random selection by weight: higher values stands a greater chance of being picked) choose a random patch to move with the probability of being chosen proportional to the weight of permeability-value
     move-to chosen-patch ; move to the chosen-patch
    ]
   if type-of-walk = "correlated" [ ; individual next step will be related to the previous one
@@ -199,8 +192,8 @@ CHOOSER
 279
 type-of-walk
 type-of-walk
-"homogeneous random" "heterogeneous random" "correlated" "levy"
-2
+"homogeneous random" "correlated" "levy"
+1
 
 BUTTON
 139
