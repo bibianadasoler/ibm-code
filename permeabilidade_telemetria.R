@@ -1,5 +1,15 @@
 # permeability layer using telemetry data
 
+# Packages ----
+library(dplyr)
+library(tibble)
+library(tidyr)
+library(sf)
+library(sp)
+library(raster)
+library(adehabitatHS)
+library(scales)
+
 # quais dados usar? todos ou com as nuvens excluidas? 
 
 # Load GPS data
@@ -14,14 +24,15 @@ telemetria_barbara <- read.csv("gps_data_filtered.csv") %>%
   mutate(ID = case_when(
     between(time, as.Date('2018-08-24'), as.Date('2018-09-10')) ~ "Barbara-1",
     between(time, as.Date('2018-09-11'), as.Date('2018-09-24')) ~ "Barbara-2")) %>% ungroup() %>%
-  st_as_sf(., coords = c("GPS.Longitude", "GPS.Latitude"), crs = CRS("+proj=longlat +datum=WGS84")) %>%
-  st_transform(., crs = CRS("+proj=aea +lat_0=-32 +lon_0=-60 +lat_1=-5 +lat_2=-42 +x_0=0 +y_0=0 +ellps=aust_SA +units=m +no_defs"))
-
+  st_as_sf(., coords = c("GPS.Longitude", "GPS.Latitude"), crs = 4326) %>%
+  st_transform(., crs = CRS("+proj=aea +lat_0=-32 +lon_0=-60 +lat_1=-5 +lat_2=-42 +x_0=0 +y_0=0 +ellps=aust_SA +units=m +no_defs")) %>%
+  st_write(., dsn = "/Users/bibianaterra/Desktop/barbara_pontos.shp", delete_layer = T)
 # Load habitat data
-habitat_barbara <- raster("/Users/bibianaterra/Desktop/barbara102033.tif")
+habitat_barbara <- raster("/Users/bibianaterra/Desktop/barbara2.tif")
 
 # Quick look
 plot(habitat_barbara)
+points(telemetria_barbara$ID)
 
 raster_points <- rasterToPoints(habitat_barbara, spatial = T)
 class_avail_barbara <- raster::extract(x = habitat_barbara, y = raster_points)
@@ -34,7 +45,7 @@ class_avail_barbara <- class_avail_barbara %>%
 
 class_use_barbara <- telemetria_barbara %>%
   mutate(class = as.factor(raster::extract(x = habitat_barbara, y = telemetria_barbara))) %>%
-  mutate(class = factor(class, levels = c( 1, 5, 14, 15, 26, 45, 50, 65))) %>%
+  mutate(class = factor(class, levels = c( 3, 4, 9, 11, 12, 15, 21, 25))) %>%
   with(., table(ID, class)) %>%
   as.data.frame(.) %>% group_by(ID) %>%
   mutate(prop_use = (Freq)/sum(Freq)) %>%
