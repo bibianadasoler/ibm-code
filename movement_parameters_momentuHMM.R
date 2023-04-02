@@ -29,7 +29,7 @@ telemetria <- read.csv("gps_data_filtered.csv") %>%
   group_by(ID) %>% # agrupando os dados por ID
   mutate(diff = c(0, diff(time))) %>% # calculando a diferenca de tempo entre registros do mesmo ID
   filter(diff <= 0 | diff >= 18) %>% ungroup() %>% # remove records obtained in a time interval < 18 min, but 0 is kept to maintain the first record
-  st_as_sf(., coords = c("GPS.Longitude", "GPS.Latitude"), crs = CRS("+proj=longlat +datum=WGS84")) %>% # define as coords como longlat
+  st_as_sf(., coords = c("GPS.Longitude", "GPS.Latitude"), crs = 4326) %>% # define as coords como longlat
   st_transform(., crs = CRS("+proj=aea +lat_0=-32 +lon_0=-60 +lat_1=-5 +lat_2=-42 +x_0=0 +y_0=0 +ellps=aust_SA +units=m +no_defs")) %>% # South America Albers Equal Area Conic
   mutate(x = st_coordinates(.)[,1],
          y = st_coordinates(.)[,2]) %>% # criando colunas com as coordenadas x e y
