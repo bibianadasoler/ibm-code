@@ -9,7 +9,7 @@ breed [anteaters anteater]
 
 
 globals[
-  npatches-visited
+  npatches-visited ; acho que isso nao foi usado
   seedlist
   ;i
   ; prob
@@ -52,11 +52,11 @@ globals[
 ]
 
 patches-own [
-  habitat
-  permeability
+  habitat ; se é habitat ou matrix
+  permeability ; valor da permeabilidade de cada patch
   road
   visits
-  cluster
+  cluster ; não entendi
 
   ;  ptype
   ;  hasroad
@@ -73,7 +73,7 @@ patches-own [
 
 
 anteaters-own [
-  mycandidate
+  mycandidate ; nao entendi pq tem essa properties... a ideia é salvar depois?
   ;last-green-x
   ;   last-green-y
   ;   number-mat
@@ -91,7 +91,7 @@ to setup
   ca
   Generating-a-landscape
 
-  ask patches with [cluster = 1] [set habitat 1 set permeability 1
+  ask patches with [cluster = 1] [set habitat 1 set permeability 1 ; nao entendi de onde vem o 1 do cluster
     set pcolor green]
   ask patches with [cluster = 2] [set habitat 2 set permeability matrix-permeability
     set pcolor white]
@@ -101,10 +101,10 @@ to setup
     set road false
   ]
 
-  ask patches with [pycor = round (dim / 2)]
+  ask patches with [pycor = round (dim / 2)] ; faz a rodovia ficar no centro
   [set road true
     set pcolor black
-    set permeability (1 - road-avoidance) * permeability
+    set permeability (1 - road-avoidance) * permeability ; vamos manter isso?
   ]
 
   setup-turtles
@@ -114,7 +114,7 @@ end
 
 
 ;; Generating a landscape
-to Generating-a-landscape
+to Generating-a-landscape ; nao entendi a partir da seedlist
 
   let ext dim
   set-patch-size 3.5 * (100 / dim)
@@ -161,7 +161,7 @@ to setup-turtles
   create-anteaters number-of-anteaters [set color black
     set size 1]
   ask anteaters [move-to rnd:weighted-one-of patches [permeability]
-    if pd? [pd]]
+    if pd? [pd]] ; nao entendi o que é isso
 end
 
 to new-run
@@ -195,7 +195,7 @@ end
 to move1
   ask anteaters [check-move
     face mycandidate
-    fd 1
+    fd 1 ; aqui ele anda um pixel por vez então?
     ask patch-here [set visits visits + 1]
   ]
 end
@@ -203,7 +203,7 @@ end
 to check-move
   let candidate-cells1 patches in-cone perceptual-range 180
   let chosen-patch rnd:weighted-one-of candidate-cells1 [permeability]
-  set mycandidate chosen-patch
+  set mycandidate chosen-patch ; mycandidate é igual ao chosen-patch? preciso de 2 objetos?
 
 end
 
@@ -216,7 +216,7 @@ to paint-patch-use
 end
 
 to paint-road-crossings
-  paint-habitats
+  paint-habitats ; isso precisa estar aqui?
   let max-use max [visits] of patches with [road = true]
   ask patches with [road = true] [set pcolor scale-color red visits max-use  1]
 end
@@ -236,16 +236,15 @@ to update-permeability
   ask patches with [cluster = 1] [set permeability 1]
   ask patches with [cluster = 2] [set permeability matrix-permeability]
 
-  ask patches with [road = true][ set permeability (1 - road-avoidance) * permeability ]
+  ask patches with [road = true][ set permeability (1 - road-avoidance) * permeability ] ; isso vamos remover?
 end
 
 
 to-report assess-top-sections
-  let sort-crossings sort-by > [visits] of patches with [road = true]
-  let total-crossings sum sort-crossings
-
-  let top-sections-effectiveness sum (sublist sort-crossings 0 (dim * .25))
-  let effectiveness top-sections-effectiveness / total-crossings
+  let sort-crossings sort-by > [visits] of patches with [road = true] ; ordena os patches por maior numero de visitas
+  let total-crossings sum sort-crossings ; soma do numero total de cruzamentos na road
+  let top-sections-effectiveness sum (sublist sort-crossings 0 (dim * .25)) ; nao entendi
+  let effectiveness top-sections-effectiveness / total-crossings ; nao entendi
   report precision effectiveness 3
 end
 
@@ -399,7 +398,7 @@ INPUTBOX
 130
 235
 steps
-100.0
+1.0
 1
 0
 Number
