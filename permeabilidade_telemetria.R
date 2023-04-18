@@ -11,9 +11,6 @@ library(adehabitatHS)
 library(momentuHMM)
 library(scales)
 
-# quais dados usar? todos ou com as nuvens excluidas? 
-# excluimos registros com distancias menores que a media do estado 2
-
 # Load GPS data ----
 telemetria_barbara <- read.csv("gps_data_filtered.csv") %>% 
   mutate(time = as.POSIXct(time, format = "%Y-%m-%d %H:%M:%S", tz = "America/New_York")) %>%
@@ -101,3 +98,40 @@ permeability_values <- permeabilidade_classe %>%
   as.matrix(.)
   
 habitat_permeability <- reclassify(habitat_barbara, permeability_values)
+
+
+
+############# Reclassificacao mapbiomas ----
+# os rasters do mapbiomas foram reclassificados agrupando nivel 4 em nivel 3 (ex: soja para lavoura temporaria)
+# mapbiomas_reclass <- matrix(data = c(3, 3, #forest formation
+#                                      5, 5, #magrove
+#                                      4, 4, #savanna formation
+#                                      12, 12, #grassland
+#                                      13, 13, #other non forest formation
+#                                      29, 29, #rocky outcrop
+#                                      32, 32, #salt flat
+#                                      11, 11, #wetland
+#                                      47, 36, #citrus to perennial crops
+#                                      46, 36, #coffee to perennial crops
+#                                      48, 36, #other to perennial crops
+#                                      62, 19, #cotton to temporary crops
+#                                      41, 19, #other to temporary crops
+#                                      40, 19, #rice to temporary crops
+#                                      39, 19, #soybean to temporary crops
+#                                      20, 19, #sugarcane to temporary crops
+#                                      9, 9, #forest plantation
+#                                      21, 21, #land use mosaic
+#                                      15, 15, #pasture
+#                                      23, 23, #beach and dune
+#                                      30, 30, #mining
+#                                      25, 25, #other non vegetated area
+#                                      24, 24, #urban area
+#                                      31, 26, #aquaculture to water
+#                                      33, 26, #river, lake and ocean to water
+#                                      27, 27), #non observed
+#                             ncol = 2, byrow = T)
+# compress <- c("COMPRESS=DEFLATE", "PREDICTOR=2", "ZLEVEL=9")
+# raster original do mapbiomas reclassificado para os grupos acima
+# para salvar datatype = "INT1U"
+#mapbiomas_2018_RECLASS <- reclassify(mapbiomas_2018, mapbiomas_reclass)
+#raster::writeRaster(mapbiomas_2018_clipped_RECLASS, "/Users/bibianaterra/OneDrive/Doutorado/Predicao_ferrovias/mapbiomas_raster/mapbiomas-2018_RECLASS.tif", format = "GTIff", options = compress, datatype = "INT1U")
