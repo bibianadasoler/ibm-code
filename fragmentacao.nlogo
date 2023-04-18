@@ -1,103 +1,317 @@
-__includes["distribution-utils.nls"]
+extensions [table
+  gis
+  palette
+  rnd
+]
 
-extensions [ gis rnd  ]
 
-globals [
-  landscape ;landscape of your study area
-  roads ; roads of your study area ; PARA ADICIONAR QUANDO COLOCARMOS OS CENARIOS
- ]
+breed [anteaters anteater]
 
-patches-own
- [
-  permeability-value ; permeability value of each land cover class
- ]
+
+globals[
+  npatches-visited
+  seedlist
+  ;i
+  ; prob
+  ; Ps
+  ; var1 ;; checking for ptype barrier
+  ; Neighbors-green
+  ; Neighbors-yellow
+  ; var5 ;;records last green patch a lynx was on
+  ; dispersal-max
+  ;
+  ; ;; iterations
+  ; ;;counter adds one each time a run of the model happens.  When it reaches the number in the iterations button it halts.
+  ; ;;See the experiment procedure
+  ; counter
+  ; ;; pvisits is for plotting the number of habitat patches visited each iteration
+  ; pvisits
+  ; ;;avgpvisits is sum of pvisits / iterations
+  ; avg-pvisits
+  ; raster1
+  ; raster_roads
+  ; raster-out
+  ; Pc
+  ; current-patch
+  ; n-barr
+  ; sum-green
+  ; sum-yellow
+  ; pattern2
+  ; x-visit-all
+  ; y-visit-all
+  ; go-multi-expt
+  ; count-rows
+  ; countvar
+  ;
+  ; surviving_lynx
+  ; ;;for sens test
+  ; xvar
+  ; matvar
+  ; var_i
+  ; pvis250718
+]
+
+patches-own [
+  habitat
+  permeability
+  road
+  visits
+  cluster
+
+  ;  ptype
+  ;  hasroad
+  ;  runs-visited
+  ;  number-of-visits
+  ;
+  ;  ;; summary variables collected when best release is run
+  ;  pvis ;; patch visits resulting from a release at this patch
+  ;  dispmean ;; mean dispersal distance from this patch
+  ;  dispmax  ;;max dispersal distance from this patch
+  ;  p2 ;; ratio of yellow to green
+  ;  patch-pvisits ;;this should capture the number of times patches visited when a release expt is made from that patch from the global pvisits
+]
+
+
+anteaters-own [
+  mycandidate
+  ;last-green-x
+  ;   last-green-y
+  ;   number-mat
+  ;   leave-var
+  ;   pleave
+  ;   travel
+  ;   distance_today
+  ;   lynxonroad ;; used in road mortality
+]
+
+
+;;------------------------------ setting up -----------------------------------------------
 
 to setup
-  clear-all
-  setup-landscape ; see the procedure below
-  create-individuals ; see the procedure below
-  carefully [ file-delete "coordinates.txt" ] [ ] ; check if there is a file with this name and if so, remove it
-  file-open "coordinates.txt" ; create a txt file to store the coordinates
+  ca
+  Generating-a-landscape
+
+  ask patches with [cluster = 1] [set habitat 1 set permeability 1
+    set pcolor green]
+  ask patches with [cluster = 2] [set habitat 2 set permeability matrix-permeability
+    set pcolor white]
+
+  ask patches[
+    set visits 0
+    set road false
+  ]
+
+  ask patches with [pycor = round (dim / 2)]
+  [set road true
+    set pcolor black
+    set permeability (1 - road-avoidance) * permeability
+  ]
+
+  setup-turtles
 
   reset-ticks
+end
+
+
+;; Generating a landscape
+to Generating-a-landscape
+
+  let ext dim
+  set-patch-size 3.5 * (100 / dim)
+  resize-world 0 (dim - 1) 0 (dim - 1)
+  ask patches [
+    set cluster nobody
+  ]
+
+  set seedlist list Proportion-of-habitat Proportion-of-matrix
+
+  ;; Criteria and scaling on very high seed counts
+  if sum seedlist != ext [
+    let c ext / sum seedlist
+    set seedlist map floor map [ ?1 -> c * ?1 ] seedlist
+    let change (item 0 seedlist + ext - sum seedlist)
+    set seedlist replace-item 0 seedlist change
+  ]
+
+  ;; Scatter seed
+  let i 0
+  foreach seedlist [ ?1 ->
+    set i i + 1
+    repeat ?1 [
+      ask one-of (patches with [cluster = nobody])[
+        set cluster i
+      ]
+    ]
+  ]
+
+  ;; Fill the voids by propagation
+  ;; Credit: Uri Wilensky, Patch Cluster Example
+  while [any? patches with [cluster = nobody]] [
+    ask patches with [cluster = nobody][
+      let c [cluster] of one-of neighbors4
+      if c != nobody [
+        set cluster c
+      ]
+    ]
+  ]
 
 end
 
-to setup-landscape ; settings of the landscape that will be load
-  set landscape gis:load-dataset "/Users/bibianaterra/OneDrive/Doutorado/Predicao_ferrovias/ibm-code/area_pequena.asc" ; loading landscape - choose the .asc file with permeability values
-  resize-world 0 gis:width-of landscape 0 gis:height-of landscape
-  gis:set-world-envelope-ds gis:envelope-of landscape ;define the world size similar to the landscape imported
-  gis:apply-raster landscape permeability-value ; get the values from the landscape to the variable permeability-value
-  ask patches [ set permeability-value round permeability-value ] ; round the permeability value
-  ask patches [ set pcolor scale-color green permeability-value 100.0 1.0 ] ; define the patch color due to its permeability value
-
+to setup-turtles
+  create-anteaters number-of-anteaters [set color black
+    set size 1]
+  ask anteaters [move-to rnd:weighted-one-of patches [permeability]
+    if pd? [pd]]
 end
 
-to create-individuals ; to create individuals
- create-turtles num-individuals [; num choosen in interface button
-    set shape "footprint other" ; define individual shape
-    set color black
-    move-to rnd:weighted-one-of patches [ permeability-value ] ; individuals are born in a random patch selection by weight
-    set size 2 ; define individual size
-    set pen-mode "down" ; draw a line of inidividual movement
-    set pen-size 0.5
+to new-run
+
+  ask turtles [die]
+  ask patches with [cluster = 1] [set habitat 1 set permeability 1
+    set pcolor green]
+  ask patches with [cluster = 2] [set habitat 2 set permeability matrix-permeability
+    set pcolor white]
+
+  ask patches[
+    set visits 0
+    set road false
+  ]
+
+  ask patches with [pycor = round (dim / 2)]
+  [set road true
+    set pcolor black
+    set permeability (1 - road-avoidance) * permeability
+  ]
+
+  setup-turtles
+
+  reset-ticks
+end
+
+to move
+  repeat steps [move1]
+end
+
+to move1
+  ask anteaters [check-move
+    face mycandidate
+    fd 1
+    ask patch-here [set visits visits + 1]
   ]
 end
 
-to go ; what individuals will do when we click in the button go
-  ask turtles [ move ]; see the procedure below
+to check-move
+  let candidate-cells1 patches in-cone perceptual-range 180
+  let chosen-patch rnd:weighted-one-of candidate-cells1 [permeability]
+  set mycandidate chosen-patch
 
-  tick
-  save-coord ; save coordinates in each go tick to have the trajectory of each individual
-end
-
-to move ; move based on the type-of-walk button
-  if type-of-walk = "homogeneous random" [ ; individual next step will be related to the previous one
-    let step-length random-gamma  mean-step sd-step
-    print step-length
-    let targets patches in-radius step-length ; all patches inside a circle with radius of step-length are targets
-    let chosen-patch one-of targets ; choose a random patch to move
-    move-to chosen-patch ; move to the chosen-patch
-   ]
-  if type-of-walk = "correlated" [ ; individual next step will be related to the previous one
-    let step-length random-gamma  mean-step sd-step
-    ;set step-length 3;step-length * 3.67
-    print step-length
-    let angle random-cauchy mean-angle concentration-angle
-    print angle
-    let targets patches in-cone step-length angle ; all patches inside the cone with radius of maximum-step-length and opening based on the mean-angle are targets
-    ;set targets  [remove-item targets patch-here]
-    ;set targets filter  targets != patch-here targets
-    ask targets [set pcolor red]
-    let chosen-patch rnd:weighted-one-of targets [ permeability-value ] ; (random selection by weight: higher values stands a greater chance of being picked) choose a random patch to move with the probability of being chosen proportional to the weight of permeability-value
-    face chosen-patch ; individual faces the target patch to change its direction
-    move-to chosen-patch ; move to the chosen-patch
-   ]
 end
 
 
-to save-coord
-  ask turtles [
-    let coords gis:envelope-of self
-    let x first coords
-    let y last coords
-    file-print (word who "," x "," y "," ticks) ; save individual number, x, y and tick number
-  ]
+;; paintting ;; post simulations
+;;
+to paint-patch-use
+  let max-use max [visits] of patches
+  ask patches [set pcolor scale-color red visits max-use  1]
 end
 
-to-report r-cauchy [loc scl] ; 4.1
-  let X (pi * (random-float 1)) ;; Netlogo tan takes degrees not radians
-  report abs (loc + scl * tan(X * (180 / pi))) ;PS COLOQUEI UM ABS
+to paint-road-crossings
+  paint-habitats
+  let max-use max [visits] of patches with [road = true]
+  ask patches with [road = true] [set pcolor scale-color red visits max-use  1]
+end
+
+
+to paint-habitats
+  ask patches with [cluster = 1] [set pcolor green]
+  ask patches with [cluster = 2] [set pcolor white]
+  ask patches with [road = true][ set pcolor black]
+end
+
+to paint-permeability
+  ask patches [set pcolor scale-color blue ((permeability + 1) * 10) 21 1]
+end
+
+to update-permeability
+  ask patches with [cluster = 1] [set permeability 1]
+  ask patches with [cluster = 2] [set permeability matrix-permeability]
+
+  ask patches with [road = true][ set permeability (1 - road-avoidance) * permeability ]
+end
+
+
+to-report assess-top-sections
+  let sort-crossings sort-by > [visits] of patches with [road = true]
+  let total-crossings sum sort-crossings
+
+  let top-sections-effectiveness sum (sublist sort-crossings 0 (dim * .25))
+  let effectiveness top-sections-effectiveness / total-crossings
+  report precision effectiveness 3
+end
+
+to save-data
+  ;saves data for a given run
+
+  ;  foreach patches-list [ ?1 ->
+  ;    ifelse not any? patches with [(patch-id = ?1) and (previous-n > 0)][
+  ;      set unoccupied-patch-counter (unoccupied-patch-counter + 1)
+  ;      if any? patches with [(patch-id = ?1) and (current-n > 0)][
+  ;        set patch-recolonization-counter (patch-recolonization-counter + 1)
+  ;      ]
+  ;    ][
+  ;      set occupied-patch-counter (occupied-patch-counter + 1)
+  ;      if not any? patches with [(patch-id = ?1) and (current-n > 0)][
+  ;        set patch-extinction-counter (patch-extinction-counter + 1)
+  ;      ]
+  ;    ]
+  ;  ]
+
+  ;  ;saves the data to a text file
+  ;  set filename (word output-file ".txt")
+  ;
+  ;  file-open filename
+  ;  file-type run-id
+  ;  file-write generations-counter
+  ;  file-write change-rate
+  ;  file-write count patches with [pcolor = green] / count patches
+  ;  file-write H
+  ;  file-write m-cost
+  ;  file-write mean-disturb
+  ;  file-write habitat-cost
+  ;  file-write carrying-capacity
+  ;  file-write lambda
+  ;  file-write competition-type
+  ;  file-write mutation-rate
+  ;  file-write mutation-increment
+  ;  file-write mean [pr-move] of turtles
+  ;  file-write mean [pr-cross] of turtles
+  ;  file-write mean [p-shape-m] of turtles
+  ;  file-write mean [p-shape-h] of turtles
+  ;  file-write pre-disperse-n
+  ;  file-write count turtles
+  ;  file-write total-patch-number
+  ;  file-write actual-emigrations + count turtles with [origin != destination]
+  ;  file-write count turtles with [origin-patch != destination-patch]
+  ;  file-write (count turtles with [origin != destination] - count turtles with [origin-patch != destination-patch])
+  ;  file-write current-habitat-mortality
+  ;  file-write new-habitat-mortality
+  ;  file-write matrix-mortality
+  ;  ifelse (unoccupied-patch-counter > 0) [file-write patch-recolonization-counter / unoccupied-patch-counter][file-type " NA"]
+  ;  file-type " "
+  ;  ifelse (occupied-patch-counter > 0)[file-print patch-extinction-counter / occupied-patch-counter][file-print "NA"]
+  ;
+  ;  file-close
+
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-277
-10
-1302
-1297
+245
+30
+603
+389
 -1
 -1
-13.74324324324325
+7.0
 1
 10
 1
@@ -108,20 +322,20 @@ GRAPHICS-WINDOW
 1
 1
 0
-73
+49
 0
-92
-1
-1
+49
+0
+0
 1
 ticks
 30.0
 
 BUTTON
-8
-10
-74
-43
+5
+30
+130
+63
 NIL
 setup
 NIL
@@ -134,142 +348,269 @@ NIL
 NIL
 1
 
+INPUTBOX
+5
+115
+130
+175
+number-of-anteaters
+100.0
+1
+0
+Number
+
+BUTTON
+5
+65
+130
+98
+move
+move
+NIL
+1
+T
+OBSERVER
+NIL
+M
+NIL
+NIL
+1
+
+BUTTON
+245
+500
+360
+533
+NIL
+paint-patch-use
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+INPUTBOX
+5
+175
+130
+235
+steps
+100.0
+1
+0
+Number
+
 SLIDER
-51
-56
-190
-89
-num-individuals
-num-individuals
+5
+400
+145
+433
+road-avoidance
+road-avoidance
+0
 1
+0.0
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+5
+310
+150
+343
+matrix-permeability
+matrix-permeability
+.01
+1
+1.0
+.01
+1
+NIL
+HORIZONTAL
+
+SWITCH
+135
+115
+240
+148
+pd?
+pd?
+1
+1
+-1000
+
+SLIDER
+5
+235
+130
+268
+dim
+dim
+10
 100
-17.0
-1
+50.0
+10
 1
 NIL
 HORIZONTAL
 
 BUTTON
-198
-10
-253
-43
-go
-repeat 100 [go]
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-79
-10
-134
-43
-go once
-go
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-CHOOSER
-14
-234
-238
-279
-type-of-walk
-type-of-walk
-"homogeneous random" "correlated" "levy"
-1
-
-BUTTON
-139
-10
-194
-43
-go 50
-repeat 50 [go]
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-71
-290
-181
-323
-save-coords
-file-close
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-INPUTBOX
-35
-159
-112
-219
-mean-angle
--0.14
-1
-0
-Number
-
-INPUTBOX
+135
 30
-93
-113
-153
-mean-step
-116.79
+240
+63
+NIL
+clear-drawing
+NIL
 1
-0
-Number
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
-INPUTBOX
-116
-93
-205
-153
-sd-step
-78.47
+SLIDER
+245
+391
+417
+424
+Proportion-of-habitat
+Proportion-of-habitat
+10
+100
+50.0
+5
 1
-0
-Number
+NIL
+HORIZONTAL
 
-INPUTBOX
-117
-158
-215
-218
-concentration-angle
-0.49
+SLIDER
+245
+426
+417
+459
+proportion-of-matrix
+proportion-of-matrix
+5
+100
+100.0
+5
 1
-0
-Number
+NIL
+HORIZONTAL
+
+MONITOR
+430
+406
+487
+451
+NIL
+seedlist
+17
+1
+11
+
+BUTTON
+125
+500
+240
+533
+NIL
+paint-habitats
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+5
+345
+150
+378
+NIL
+update-permeability
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+MONITOR
+490
+405
+612
+450
+NIL
+assess-top-sections
+4
+1
+11
+
+BUTTON
+135
+65
+240
+98
+NIL
+new-run
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+365
+500
+480
+533
+NIL
+paint-road-crossings
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+5
+435
+145
+468
+perceptual-range
+perceptual-range
+1.5
+10
+1.5
+.5
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -283,9 +624,6 @@ Number
 ## HOW TO USE IT
 
 (how to use the model, including a description of each of the items in the Interface tab)
-There are three types of walk available in this model. 
-Random - to use this one you should chose the "correlated" option and must define the mean-angle as 360, this way the individual can move to anywhere inside a circle.
-Correlated - the individiual next step will be related to the previous one, so it will move to a patch inside a cone with the size defined by the mean angle
 
 ## THINGS TO NOTICE
 
@@ -452,19 +790,6 @@ Circle -7500403 true true 96 51 108
 Circle -16777216 true false 113 68 74
 Polygon -10899396 true false 189 233 219 188 249 173 279 188 234 218
 Polygon -10899396 true false 180 255 150 210 105 210 75 240 135 240
-
-footprint other
-true
-0
-Polygon -7500403 true true 75 195 90 240 135 270 165 270 195 255 225 195 225 180 195 165 177 154 167 139 150 135 132 138 124 151 105 165 76 172
-Polygon -7500403 true true 250 136 225 165 210 135 210 120 227 100 241 99
-Polygon -7500403 true true 75 135 90 135 105 120 105 75 90 75 60 105
-Polygon -7500403 true true 120 122 155 121 161 62 148 40 136 40 118 70
-Polygon -7500403 true true 176 126 200 121 206 89 198 61 186 57 166 106
-Polygon -7500403 true true 93 69 103 68 102 50
-Polygon -7500403 true true 146 34 136 33 137 15
-Polygon -7500403 true true 198 55 188 52 189 34
-Polygon -7500403 true true 238 92 228 94 229 76
 
 house
 false
@@ -646,5 +971,5 @@ true
 Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 @#$#@#$#@
-0
+1
 @#$#@#$#@
