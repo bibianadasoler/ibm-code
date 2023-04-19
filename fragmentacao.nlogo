@@ -88,6 +88,7 @@ anteaters-own [
 ;;------------------------------ setting up -----------------------------------------------
 
 to setup
+  ;TESTE GIT
   ca
   Generating-a-landscape
 
@@ -243,8 +244,8 @@ end
 to-report assess-top-sections
   let sort-crossings sort-by > [visits] of patches with [road = true] ; ordena os patches por maior numero de visitas
   let total-crossings sum sort-crossings ; soma do numero total de cruzamentos na road
-  let top-sections-effectiveness sum (sublist sort-crossings 0 (dim * .25)) ; nao entendi
-  let effectiveness top-sections-effectiveness / total-crossings ; nao entendi
+  let top-sections-effectiveness sum (sublist sort-crossings 0 (dim * .25)) ; soma dos cruzamentos nos patches mais usados 25% quartil
+  let effectiveness top-sections-effectiveness / total-crossings
   report precision effectiveness 3
 end
 
@@ -310,7 +311,7 @@ GRAPHICS-WINDOW
 389
 -1
 -1
-7.0
+3.5
 1
 10
 1
@@ -321,9 +322,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-49
+99
 0
-49
+99
 0
 0
 1
@@ -453,7 +454,7 @@ dim
 dim
 10
 100
-50.0
+100.0
 10
 1
 NIL
