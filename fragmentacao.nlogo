@@ -97,16 +97,16 @@ to setup
   ask patches with [cluster = 2] [set habitat 2 set permeability matrix-permeability
     set pcolor white]
 
-  ask patches[
-    set visits 0
-    set road false
-  ]
-
-  ask patches with [pycor = round (dim / 2)] ; faz a rodovia ficar no centro
-  [set road true
-    set pcolor black
-    set permeability (1 - road-avoidance) * permeability ; vamos manter isso?
-  ]
+;  ask patches[
+;    set visits 0
+;    set road false
+;  ]
+;
+;  ask patches with [pycor = round (dim / 2)] ; faz a rodovia ficar no centro
+;  [set road true
+;    set pcolor black
+;    set permeability (1 - road-avoidance) * permeability ; vamos manter isso?
+;  ]
 
   setup-turtles
 
@@ -129,33 +129,129 @@ to Generating-a-landscape ; nao entendi a partir da seedlist
   ;; Criteria and scaling on very high seed counts
   if sum seedlist != ext [
     let c ext / sum seedlist
-    set seedlist map floor map [ ?1 -> c * ?1 ] seedlist
-    let change (item 0 seedlist + ext - sum seedlist)
+    print c
+    set seedlist map floor (map [ ?1 -> c * ?1 ] seedlist)
+    ; ?1 is a variable that is used to refer to the first input argument of a procedure
+    ; map [ ?1 -> c * ?1 ] seedlist: This applies the function [ ?1 -> c * ?1 ] to each
+    ; item in the seedlist variable. This function multiplies each item in the seedlist by a
+    ; constant c, where c is some value that has been defined elsewhere in the code. The result
+    ; is a new list of numbers.
+    ; ou seja, multiplica cada valor do seedlist por c para obter a proporcao de habitat/matrix
+    print seedlist
+    ; aqui o valor 1 de seed list ficou menor que o mostrado na caixinha da interface
+    let change ((item 0 seedlist) + ext - sum seedlist)
+    print change
     set seedlist replace-item 0 seedlist change
+    ; aqui acho que é pra fechar a soma da dim
   ]
 
-  ;; Scatter seed
-  let i 0
-  foreach seedlist [ ?1 ->
-    set i i + 1
-    repeat ?1 [
-      ask one-of (patches with [cluster = nobody])[
-        set cluster i
-      ]
-    ]
+;  ;; Scatter seed
+;  let i 0
+;  foreach seedlist [ ?1 -> ;
+;    set i i + 1
+;    repeat ?1 [
+;      ask one-of (patches with [cluster = nobody])[
+;        ; primeiro pega patches aleatorios e coloca cluster 1 para os X patches de habitat
+;        ; (primeiro da seedlist) e depois coloca 2 para os X patches da matrix
+;        set cluster i
+;      ]
+;    ]
+;  ]
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; INDICAR PATCHES DE HABITAT
+;let num-patches 8
+;let patch-distance (world-width / num-patches)
+;  print patch-distance
+;let start-xcor (- world-width / 2 + patch-distance / 2)
+;  print start-xcor
+;
+;repeat num-patches [
+;      ask patches with [pxcor > start-xcor - patch-distance / 2 and pxcor < start-xcor + patch-distance / 2] [
+;      set cluster 1
+;  ]
+;  set start-xcor start-xcor + patch-distance
+;      ]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;  ;; Fill the voids by propagation
+;  ;; Credit: Uri Wilensky, Patch Cluster Example
+;  while [any? patches with [cluster = nobody]] [
+;    ask patches with [cluster = nobody][
+;      let c [cluster] of one-of neighbors4
+;      if c != nobody [
+;        set cluster c
+;      ]
+;    ]
+;  ]
+;let num-patches 2
+;ask n-of num-patches patches [
+;    set cluster 1
+;  ]
+;  ask patch  0  0 [ set pcolor white ]
+
+;let num-clusters 2
+;let patches-list patches
+;let seedlist-item-0 item 0 seedlist
+;let patches-per-cluster (floor seedlist-item-0 / num-clusters) * dim
+;print patches-per-cluster
+;ask n-of patches-per-cluster patches-list [
+;    set cluster 1
+;  ]
+;  ;set patches-list patches with [cluster = nobody]
+
+if num-patches = 2 [
+ask patches with [pxcor mod num-patches = 0 and pycor mod num-patches = 0] [set cluster 1]
+ask patches [
+  if cluster = 1 [set pcolor green - 2]
+            ]
+  ]
+if num-patches = 4 [
+let mid-x max-pxcor / num-patches
+let mid-y max-pycor / num-patches
+print mid-x
+print mid-y
+  ask patch mid-x (- mid-y) [ set pcolor green ]
+  ask patch mid-x mid-y [ set pcolor green ]
+  ask patch (- mid-x) mid-y [ set pcolor green ]
+  ask patch (- mid-x) (- mid-y) [ set pcolor green ]
   ]
 
-  ;; Fill the voids by propagation
-  ;; Credit: Uri Wilensky, Patch Cluster Example
-  while [any? patches with [cluster = nobody]] [
-    ask patches with [cluster = nobody][
-      let c [cluster] of one-of neighbors4
-      if c != nobody [
-        set cluster c
-      ]
-    ]
+
+if num-patches = 8 [
+let mid-x max-pxcor / num-patches
+let mid-y max-pycor / num-patches
+print mid-x
+print mid-y
+  ask patch mid-x (- mid-y) [ set pcolor green ]
+    ask patch (mid-x * 2) (- mid-y) [ set pcolor green ]
+  ask patch (mid-x / 2) (- mid-y) [ set pcolor green ]
+  ask patch mid-x mid-y [ set pcolor green ]
+  ask patch (- mid-x) mid-y [ set pcolor green ]
+  ask patch (- mid-x) (- mid-y) [ set pcolor green ]
   ]
 
+if num-patches = 16 [
+    resize-world 0 world-width * 2 0 world-height * 2
+let set-patch-set patches with [pxcor >= 0 and pxcor < world-width and pycor >= 0 and pycor < world-height]
+ask patches with [pxcor < 0] [
+  set quarter 1
+  set pcolor red
+]
+ask patches with [pycor > world-height] [
+  set quarter 2
+  set pcolor blue
+]
+ask patches with [pxcor > world-width] [
+  set quarter 3
+  set pcolor green
+]
+ask patches with [pycor < 0] [
+  set quarter 4
+  set pcolor yellow
+]
+  ]
 end
 
 to setup-turtles
@@ -611,6 +707,16 @@ perceptual-range
 1
 NIL
 HORIZONTAL
+
+CHOOSER
+140
+175
+232
+220
+num-patches
+num-patches
+2 4 8 16
+3
 
 @#$#@#$#@
 ## WHAT IS IT?
