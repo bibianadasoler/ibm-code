@@ -170,10 +170,15 @@ print mid-y
       let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
       ask patches-to-paint [ set cluster 1 ]
     ] ; centro do patch
+;  ask patch mid-x (3 * mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
+;      ask patches-to-paint [ set cluster 1 ]
+;    ]
   ask patch mid-x mid-y [
       let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
       ask patches-to-paint [ set cluster 1 ]
     ]
+
   ] ; close num-patches 4
 
 if num-patches = 4 [
