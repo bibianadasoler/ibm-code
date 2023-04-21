@@ -1,285 +1,251 @@
 extensions [table
   gis
-  palette
   rnd
+  csv
 ]
-
-
-breed [anteaters anteater]
-
 
 globals[
-  npatches-visited ; acho que isso nao foi usado
   seedlist
-  ;i
-  ; prob
-  ; Ps
-  ; var1 ;; checking for ptype barrier
-  ; Neighbors-green
-  ; Neighbors-yellow
-  ; var5 ;;records last green patch a lynx was on
-  ; dispersal-max
-  ;
-  ; ;; iterations
-  ; ;;counter adds one each time a run of the model happens.  When it reaches the number in the iterations button it halts.
-  ; ;;See the experiment procedure
-  ; counter
-  ; ;; pvisits is for plotting the number of habitat patches visited each iteration
-  ; pvisits
-  ; ;;avgpvisits is sum of pvisits / iterations
-  ; avg-pvisits
-  ; raster1
-  ; raster_roads
-  ; raster-out
-  ; Pc
-  ; current-patch
-  ; n-barr
-  ; sum-green
-  ; sum-yellow
-  ; pattern2
-  ; x-visit-all
-  ; y-visit-all
-  ; go-multi-expt
-  ; count-rows
-  ; countvar
-  ;
-  ; surviving_lynx
-  ; ;;for sens test
-  ; xvar
-  ; matvar
-  ; var_i
-  ; pvis250718
-]
+  ;filename
+  ]
 
 patches-own [
-  habitat ; se é habitat ou matrix
-  permeability ; valor da permeabilidade de cada patch
+  habitat
+  permeability
   road
   visits
-  cluster ; não entendi
-
-  ;  ptype
-  ;  hasroad
-  ;  runs-visited
-  ;  number-of-visits
-  ;
-  ;  ;; summary variables collected when best release is run
-  ;  pvis ;; patch visits resulting from a release at this patch
-  ;  dispmean ;; mean dispersal distance from this patch
-  ;  dispmax  ;;max dispersal distance from this patch
-  ;  p2 ;; ratio of yellow to green
-  ;  patch-pvisits ;;this should capture the number of times patches visited when a release expt is made from that patch from the global pvisits
 ]
 
-
-anteaters-own [
+turtles-own [
   mycandidate ; nao entendi pq tem essa properties... a ideia é salvar depois?
-  ;last-green-x
-  ;   last-green-y
-  ;   number-mat
-  ;   leave-var
-  ;   pleave
-  ;   travel
-  ;   distance_today
-  ;   lynxonroad ;; used in road mortality
 ]
 
 
 ;;------------------------------ setting up -----------------------------------------------
 
 to setup
-  ;TESTE GIT
   ca
-  Generating-a-landscape
 
-  ask patches with [pycor = round (dim / 2)] ; faz a rodovia ficar no centro
-  [set road true
-    set pcolor black
-    set permeability (1 - road-avoidance) * permeability ; vamos manter isso?
+  let ext dim
+  set-patch-size 3.5 * (100 / dim)
+  resize-world 0 (dim - 1) 0 (dim - 1)
+  ask patches [ set habitat nobody ]
+
+  ; to calculate the number of patches of habitat in the dimension chose
+  set seedlist list Proportion-of-habitat (100 - Proportion-of-habitat)
+   if sum seedlist != ext [
+    let c ext / sum seedlist
+    print c
+    set seedlist map floor (map [ ?1 -> c * ?1 ] seedlist)
+    let change ((item 0 seedlist) + ext - sum seedlist)
+    print change
+    set seedlist replace-item 0 seedlist change
   ]
-  ask patches with [cluster = 1] [set habitat 1 set permeability 1
+
+  ; to save outputs
+  ;if save-data? [set-file]
+
+   if landscape = "random" [landscape-random]
+   if landscape = 1 [landscape-1]
+   if landscape = 8 [landscape-8]
+   if landscape = 16 [landscape-16]
+
+;  ifelse regular-landscape?
+;  [number-of-patches]
+;  [generating-a-landscape]
+
+  ; color and properties
+  ask patches with [habitat = 1] [set permeability 1
     set pcolor green]
-
-  ask patches with [cluster != 1 and road != true] [set habitat 2 set permeability matrix-permeability
+  ask patches with [habitat != 1] [set habitat 2
+    set permeability matrix-permeability
     set pcolor white]
-
-;  ask patches[
-;    set visits 0
-;    set road false
-;  ]
-;
-
+  ask patches [
+    set visits 0
+    set road (ifelse-value (pycor = round (dim / 2)) [true] [false])
+    if road = true [ set pcolor black ]
+  ]
 
   setup-turtles
 
   reset-ticks
 end
 
-
-;; Generating a landscape
-to Generating-a-landscape ; nao entendi a partir da seedlist
-
-  let ext dim
-  set-patch-size 3.5 * (100 / dim)
-  resize-world 0 (dim - 1) 0 (dim - 1)
-  ask patches [
-    set cluster nobody
-  ]
-
-  set seedlist list Proportion-of-habitat Proportion-of-matrix
-
-  ;; Criteria and scaling on very high seed counts
-  if sum seedlist != ext [
-    let c ext / sum seedlist
-    print c
-    set seedlist map floor (map [ ?1 -> c * ?1 ] seedlist)
-    ; ?1 is a variable that is used to refer to the first input argument of a procedure
-    ; map [ ?1 -> c * ?1 ] seedlist: This applies the function [ ?1 -> c * ?1 ] to each
-    ; item in the seedlist variable. This function multiplies each item in the seedlist by a
-    ; constant c, where c is some value that has been defined elsewhere in the code. The result
-    ; is a new list of numbers.
-    ; ou seja, multiplica cada valor do seedlist por c para obter a proporcao de habitat/matrix
-    print seedlist
-    ; aqui o valor 1 de seed list ficou menor que o mostrado na caixinha da interface
-    let change ((item 0 seedlist) + ext - sum seedlist)
-    print change
-    set seedlist replace-item 0 seedlist change
-    ; aqui acho que é pra fechar a soma da dim
-  ]
-
-;  ;; Scatter seed
-;  let i 0
-;  foreach seedlist [ ?1 -> ;
-;    set i i + 1
-;    repeat ?1 [
-;      ask one-of (patches with [cluster = nobody])[
-;        ; primeiro pega patches aleatorios e coloca cluster 1 para os X patches de habitat
-;        ; (primeiro da seedlist) e depois coloca 2 para os X patches da matrix
-;        set cluster i
-;      ]
-;    ]
+;; Create regular landscapes - adicionar cenarios listras
+to landscape-1
+;if num-patches = 1 [
+let mid-x max-pxcor / (landscape * 2)
+let mid-y max-pycor / (landscape * 2)
+  ask patch mid-x mid-y [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
 ;  ]
-
-
-if num-patches = 2 [
-let mid-x round (max-pxcor / num-patches)
-let mid-y max-pycor / (num-patches * 2)
-print mid-x
-print mid-y
-  ask patch (- mid-x) (- mid-y) [
-      let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
-      ask patches-to-paint [ set cluster 1 ]
-    ] ; centro do patch
-  ask patch mid-x mid-y [
-      let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
-      ask patches-to-paint [ set cluster 1 ]
-    ]
-  ] ; close num-patches 4
-
-if num-patches = 4 [
-let mid-x max-pxcor / num-patches
-let mid-y max-pycor / num-patches
-print mid-x
-print mid-y
-  ask patch (- mid-x) (- 3 * mid-y) [
-      let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
-      ask patches-to-paint [ set cluster 1 ]
-    ] ; centro do patch
-  ask patch mid-x (3 * mid-y) [
-      let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
-      ask patches-to-paint [ set cluster 1 ]
-    ]
-  ask patch mid-x mid-y [
-      let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
-      ask patches-to-paint [ set cluster 1 ]
-    ]
-  ask patch (- mid-x) (3 * mid-y) [
-      let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
-      ask patches-to-paint [ set cluster 1 ]
-   ]
-  ] ; close num-patches 4
-
-if num-patches = 8 [
-let mid-x max-pycor / (num-patches / 2) ; para ter só duas colunas
-let mid-y max-pycor / num-patches
-print mid-x
-print mid-y
-  ask patch mid-x (- mid-y) [
-      let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
-      ask patches-to-paint [ set cluster 1 ]
-    ] ; centro do patch 1
-  ask patch (- mid-x) (- mid-y) [
-      let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
-      ask patches-to-paint [ set cluster 1 ]
-  ]  ; centro do patch
-  ask patch mid-x (- 3 * mid-y) [
-      let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
-      ask patches-to-paint [ set cluster 1 ] ] ; centro do patch
-  ask patch (- mid-x) (- 3 * mid-y) [
-      let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
-      ask patches-to-paint [ set cluster 1 ] ] ; centro do patch
-  ask patch mid-x (3 * mid-y) [
-      let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
-      ask patches-to-paint [ set cluster 1 ]
-    ]
-  ask patch mid-x mid-y [
-      let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
-      ask patches-to-paint [ set cluster 1 ]
-    ]
-  ask patch (- mid-x) mid-y [
-      let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
-      ask patches-to-paint [ set cluster 1 ]
-    ]
-  ask patch (- mid-x) (3 * mid-y) [
-      let patches-to-paint patches in-radius sqrt((item 0 seedlist * 100 / num-patches) / pi)
-      ask patches-to-paint [ set cluster 1 ]
-    ]
-  ] ; close num-patches 8
-
-  if num-patches = 16 [
-  ask patches [
-  if pxcor >= 0 and pycor >= 0 [
-    let quadrant 1
-        set pcolor blue
-  ]
-  if pxcor < 0 and pycor >= 0 [
-    let quadrant 2
-  ]
-  if pxcor < 0 and pycor < 0 [
-    let quadrant 3
-  ]
-  if pxcor >= 0 and pycor < 0 [
-    let quadrant 4
-  ]
-]
-  ]
 end
 
+;if num-patches = 2 [
+;let mid-x round (max-pxcor / num-patches)
+;let mid-y max-pycor / (num-patches * 2)
+;  ask patch (- mid-x) (- mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch mid-x mid-y [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ]
+;
+;if num-patches = 4 [
+;let mid-x max-pxcor / num-patches
+;let mid-y max-pycor / num-patches
+;  ask patch (- mid-x) (- 3 * mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch mid-x (3 * mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch mid-x mid-y [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch (- mid-x) (3 * mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ]
+to landscape-8
+;if num-patches = 8 [
+;let mid-x max-pycor / (num-patches / 2) ; para ter só duas colunas
+;let mid-y max-pycor / num-patches
+;  ask patch mid-x (- mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch (- mid-x) (- mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch mid-x (- 3 * mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch (- mid-x) (- 3 * mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch mid-x (3 * mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch mid-x mid-y [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch (- mid-x) mid-y [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch (- mid-x) (3 * mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;;  ]
+end
+to landscape-16
+;if num-patches = 16 [
+;let mid-x max-pycor / (num-patches / 2)
+;let mid-y max-pycor / (num-patches / 2)
+;  ask patch mid-x (- mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch (3 * mid-x) (- mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch (- 3 * mid-x) (- mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch (- mid-x) (- mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch mid-x (- 3 * mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch (3 * mid-x) (- 3 * mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch (- 3 * mid-x) (- 3 * mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;    ask patch (- mid-x) (- 3 * mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch mid-x (3 * mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch (3 * mid-x) (3 * mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch (- 3 * mid-x) (3 * mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch (- mid-x) (3 * mid-y) [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch mid-x mid-y [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch (3 * mid-x) mid-y [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch (- 3 * mid-x) mid-y [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ask patch (- mid-x) mid-y [
+;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
+;      ask patches-to-paint [ set habitat 1 ] ]
+;  ] ; close num-patches 16
+
+end
+
+
+;; Generating a landscape
+to landscape-random ;
+
+  let i 0
+  foreach seedlist [ ?1 ->
+    set i i + 1
+    repeat ?1 [
+      ask one-of (patches with [habitat = nobody])[
+        set habitat i
+      ]
+    ]
+  ]
+
+  ;; Credit: Uri Wilensky, Patch Cluster Example
+  while [any? patches with [habitat = nobody]] [
+    ask patches with [habitat = nobody][
+      let c [habitat] of one-of neighbors4
+      if c != nobody [
+        set habitat c
+      ]
+    ]
+  ]
+
+end
+
+
 to setup-turtles
-  create-anteaters number-of-anteaters [set color white
+  create-turtles number-of-individuals [ set color black
     set size 1]
-  ask anteaters [move-to rnd:weighted-one-of patches [permeability]
-    if pd? [pd]] ; nao entendi o que é isso
+  ask turtles [move-to rnd:weighted-one-of patches [permeability] ;;;;;;;; onde colocaras turtles?
+    if pd? [pd]]
 end
 
 to new-run
-
+  ; keep the landscape but change the turtles
   ask turtles [die]
-  ask patches with [cluster = 1] [set habitat 1 set permeability 1
-    set pcolor green]
-  ask patches with [cluster = 2] [set habitat 2 set permeability matrix-permeability
-    set pcolor white]
-
-;  ask patches[
-;    set visits 0
-;    set road false
-;  ]
-;
-;  ask patches with [pycor = round (dim / 2)]
-;  [set road true
-;    set pcolor black
-;    set permeability (1 - road-avoidance) * permeability
-;  ]
+  ask patches with [habitat = 1] [
+    set permeability 1
+    set pcolor green
+  ]
+  ask patches with [habitat != 1] [
+    set habitat 2
+    set permeability matrix-permeability
+    set pcolor white
+  ]
+  ask patches [
+    set visits 0
+    set road (ifelse-value (pycor = round (dim / 2)) [true] [false])
+    if road = true [ set pcolor black ]
+  ]
 
   setup-turtles
 
@@ -287,13 +253,13 @@ to new-run
 end
 
 to move
-  repeat steps [move1]
+  repeat steps [move1 tick]
 end
 
 to move1
-  ask anteaters [check-move
+  ask turtles [check-move
     face mycandidate
-    fd 1 ; aqui ele anda um pixel por vez então?
+    fd 1
     ask patch-here [set visits visits + 1]
   ]
 end
@@ -301,7 +267,7 @@ end
 to check-move
   let candidate-cells1 patches in-cone perceptual-range 180
   let chosen-patch rnd:weighted-one-of candidate-cells1 [permeability]
-  set mycandidate chosen-patch ; mycandidate é igual ao chosen-patch? preciso de 2 objetos?
+  set mycandidate chosen-patch
 
 end
 
@@ -314,27 +280,21 @@ to paint-patch-use
 end
 
 to paint-road-crossings
-  paint-habitats ; isso precisa estar aqui?
+  paint-habitats
   let max-use max [visits] of patches with [road = true]
   ask patches with [road = true] [set pcolor scale-color red visits max-use  1]
 end
 
 
 to paint-habitats
-  ask patches with [cluster = 1] [set pcolor green]
-  ask patches with [cluster = 2] [set pcolor white]
+  ask patches with [habitat = 1] [set pcolor green]
+  ask patches with [habitat = 2] [set pcolor white]
   ask patches with [road = true][ set pcolor black]
 end
 
-to paint-permeability
-  ask patches [set pcolor scale-color blue ((permeability + 1) * 10) 21 1]
-end
-
 to update-permeability
-  ask patches with [cluster = 1] [set permeability 1]
-  ask patches with [cluster = 2] [set permeability matrix-permeability]
-
-  ask patches with [road = true][ set permeability (1 - road-avoidance) * permeability ] ; isso vamos remover?
+  ask patches with [habitat = 1] [set permeability 1]
+  ask patches with [habitat = 2] [set permeability matrix-permeability]
 end
 
 
@@ -346,65 +306,25 @@ to-report assess-top-sections
   report precision effectiveness 3
 end
 
-to save-data
-  ;saves data for a given run
-
-  ;  foreach patches-list [ ?1 ->
-  ;    ifelse not any? patches with [(patch-id = ?1) and (previous-n > 0)][
-  ;      set unoccupied-patch-counter (unoccupied-patch-counter + 1)
-  ;      if any? patches with [(patch-id = ?1) and (current-n > 0)][
-  ;        set patch-recolonization-counter (patch-recolonization-counter + 1)
-  ;      ]
-  ;    ][
-  ;      set occupied-patch-counter (occupied-patch-counter + 1)
-  ;      if not any? patches with [(patch-id = ?1) and (current-n > 0)][
-  ;        set patch-extinction-counter (patch-extinction-counter + 1)
-  ;      ]
-  ;    ]
-  ;  ]
-
-  ;  ;saves the data to a text file
-  ;  set filename (word output-file ".txt")
-  ;
-  ;  file-open filename
-  ;  file-type run-id
-  ;  file-write generations-counter
-  ;  file-write change-rate
-  ;  file-write count patches with [pcolor = green] / count patches
-  ;  file-write H
-  ;  file-write m-cost
-  ;  file-write mean-disturb
-  ;  file-write habitat-cost
-  ;  file-write carrying-capacity
-  ;  file-write lambda
-  ;  file-write competition-type
-  ;  file-write mutation-rate
-  ;  file-write mutation-increment
-  ;  file-write mean [pr-move] of turtles
-  ;  file-write mean [pr-cross] of turtles
-  ;  file-write mean [p-shape-m] of turtles
-  ;  file-write mean [p-shape-h] of turtles
-  ;  file-write pre-disperse-n
-  ;  file-write count turtles
-  ;  file-write total-patch-number
-  ;  file-write actual-emigrations + count turtles with [origin != destination]
-  ;  file-write count turtles with [origin-patch != destination-patch]
-  ;  file-write (count turtles with [origin != destination] - count turtles with [origin-patch != destination-patch])
-  ;  file-write current-habitat-mortality
-  ;  file-write new-habitat-mortality
-  ;  file-write matrix-mortality
-  ;  ifelse (unoccupied-patch-counter > 0) [file-write patch-recolonization-counter / unoccupied-patch-counter][file-type " NA"]
-  ;  file-type " "
-  ;  ifelse (occupied-patch-counter > 0)[file-print patch-extinction-counter / occupied-patch-counter][file-print "NA"]
-  ;
-  ;  file-close
-
+to save-output
+  carefully [ file-delete "output.csv" ] [ ] ; check if there is a file with this name and if so, remove it
+  let filename ("output.csv")
+  file-open filename
+  ; write the headers for the columns first and then save values
+  csv:to-file filename (list (list "number-of-individuals" "steps" "landscape_area"
+    "habitat_area" "matrix_area" "landscape" "proportion_habitat" "total_crossings"
+    "assess-top-sections")
+                             (list (number-of-individuals) (steps) (count patches)
+    (count patches with [habitat = 1]) (count patches with [habitat = 2])
+    (landscape)  (proportion-of-habitat) (sum [visits] of patches with [road = true])
+    assess-top-sections))
+  file-close
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-245
+260
 30
-603
+618
 389
 -1
 -1
@@ -447,11 +367,11 @@ NIL
 
 INPUTBOX
 5
-115
+140
 130
-175
-number-of-anteaters
-0.0
+200
+number-of-individuals
+10.0
 1
 0
 Number
@@ -474,9 +394,9 @@ NIL
 1
 
 BUTTON
-245
+385
 500
-360
+500
 533
 NIL
 paint-patch-use
@@ -492,35 +412,20 @@ NIL
 
 INPUTBOX
 5
-175
+200
 130
-235
+260
 steps
-1.0
+1000.0
 1
 0
 Number
 
 SLIDER
 5
-400
-145
-433
-road-avoidance
-road-avoidance
-0
-1
-0.0
-0.1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-5
-310
-150
-343
+435
+160
+468
 matrix-permeability
 matrix-permeability
 .01
@@ -533,9 +438,9 @@ HORIZONTAL
 
 SWITCH
 135
-115
+140
 240
-148
+173
 pd?
 pd?
 1
@@ -544,9 +449,9 @@ pd?
 
 SLIDER
 5
-235
+100
 130
-268
+133
 dim
 dim
 10
@@ -575,50 +480,35 @@ NIL
 1
 
 SLIDER
-245
-391
-417
-424
+5
+305
+160
+338
 Proportion-of-habitat
 Proportion-of-habitat
 10
 100
-50.0
-5
-1
-NIL
-HORIZONTAL
-
-SLIDER
-245
-426
-417
-459
-proportion-of-matrix
-proportion-of-matrix
-5
-100
-100.0
+25.0
 5
 1
 NIL
 HORIZONTAL
 
 MONITOR
-430
-406
-487
-451
-NIL
-seedlist
+265
+400
+372
+445
+total-crossings
+sum [visits] of patches with [road = true]
 17
 1
 11
 
 BUTTON
-125
+265
 500
-240
+380
 533
 NIL
 paint-habitats
@@ -634,9 +524,9 @@ NIL
 
 BUTTON
 5
-345
-150
-378
+470
+160
+503
 NIL
 update-permeability
 NIL
@@ -650,10 +540,10 @@ NIL
 1
 
 MONITOR
-490
-405
-612
-450
+395
+400
+517
+445
 NIL
 assess-top-sections
 4
@@ -678,9 +568,9 @@ NIL
 1
 
 BUTTON
-365
+505
 500
-480
+620
 533
 NIL
 paint-road-crossings
@@ -696,9 +586,9 @@ NIL
 
 SLIDER
 5
-435
-145
-468
+265
+160
+298
 perceptual-range
 perceptual-range
 1.5
@@ -710,14 +600,42 @@ NIL
 HORIZONTAL
 
 CHOOSER
-140
-175
-232
-220
-num-patches
-num-patches
-2 4 8 16
+5
+385
+97
+430
+landscape
+landscape
+"random" 1 8 16
+1
+
+BUTTON
+5
+555
+107
+588
+save output
+save-output
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SWITCH
+5
+515
+127
+548
+save-data?
+save-data?
 0
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
