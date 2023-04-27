@@ -47,12 +47,10 @@ to setup
 
    if landscape = "random" [landscape-random]
    if landscape = 1 [landscape-1]
+   if landscape = 2 [landscape-2]
+   if landscape = 4 [landscape-4]
    if landscape = 8 [landscape-8]
    if landscape = 16 [landscape-16]
-
-;  ifelse regular-landscape?
-;  [number-of-patches]
-;  [generating-a-landscape]
 
   ; color and properties
   ask patches with [habitat = 1] [set permeability 1
@@ -73,130 +71,123 @@ end
 
 ;; Create regular landscapes - adicionar cenarios listras
 to landscape-1
-;if num-patches = 1 [
 let mid-x max-pxcor / (landscape * 2)
 let mid-y max-pycor / (landscape * 2)
   ask patch mid-x mid-y [
       let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
       ask patches-to-paint [ set habitat 1 ] ]
-;  ]
 end
 
-;if num-patches = 2 [
-;let mid-x round (max-pxcor / num-patches)
-;let mid-y max-pycor / (num-patches * 2)
-;  ask patch (- mid-x) (- mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch mid-x mid-y [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ]
-;
-;if num-patches = 4 [
-;let mid-x max-pxcor / num-patches
-;let mid-y max-pycor / num-patches
-;  ask patch (- mid-x) (- 3 * mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch mid-x (3 * mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch mid-x mid-y [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch (- mid-x) (3 * mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ]
+to landscape-2
+let mid-x round (max-pxcor / landscape)
+let mid-y max-pycor / (landscape * 2)
+  ask patch (- mid-x) (- mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch mid-x mid-y [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+end
+
+to landscape-4
+let mid-x max-pxcor / landscape
+let mid-y max-pycor / landscape
+  ask patch (- mid-x) (- 3 * mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch mid-x (3 * mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch mid-x mid-y [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch (- mid-x) (3 * mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+end
+
 to landscape-8
-;if num-patches = 8 [
-;let mid-x max-pycor / (num-patches / 2) ; para ter só duas colunas
-;let mid-y max-pycor / num-patches
-;  ask patch mid-x (- mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch (- mid-x) (- mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch mid-x (- 3 * mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch (- mid-x) (- 3 * mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch mid-x (3 * mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch mid-x mid-y [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch (- mid-x) mid-y [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch (- mid-x) (3 * mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;;  ]
+let mid-x max-pycor / (landscape / 2) ; para ter só duas colunas
+let mid-y max-pycor / landscape
+  ask patch mid-x (- mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch (- mid-x) (- mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch mid-x (- 3 * mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch (- mid-x) (- 3 * mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch mid-x (3 * mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch mid-x mid-y [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch (- mid-x) mid-y [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch (- mid-x) (3 * mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
 end
+
 to landscape-16
-;if num-patches = 16 [
-;let mid-x max-pycor / (num-patches / 2)
-;let mid-y max-pycor / (num-patches / 2)
-;  ask patch mid-x (- mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch (3 * mid-x) (- mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch (- 3 * mid-x) (- mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch (- mid-x) (- mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch mid-x (- 3 * mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch (3 * mid-x) (- 3 * mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch (- 3 * mid-x) (- 3 * mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;    ask patch (- mid-x) (- 3 * mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch mid-x (3 * mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch (3 * mid-x) (3 * mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch (- 3 * mid-x) (3 * mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch (- mid-x) (3 * mid-y) [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch mid-x mid-y [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch (3 * mid-x) mid-y [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch (- 3 * mid-x) mid-y [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ask patch (- mid-x) mid-y [
-;      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / num-patches) / pi)
-;      ask patches-to-paint [ set habitat 1 ] ]
-;  ] ; close num-patches 16
-
+let mid-x max-pycor / (landscape / 2)
+let mid-y max-pycor / (landscape / 2)
+  ask patch mid-x (- mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch (3 * mid-x) (- mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch (- 3 * mid-x) (- mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch (- mid-x) (- mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch mid-x (- 3 * mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch (3 * mid-x) (- 3 * mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch (- 3 * mid-x) (- 3 * mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+    ask patch (- mid-x) (- 3 * mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch mid-x (3 * mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch (3 * mid-x) (3 * mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch (- 3 * mid-x) (3 * mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch (- mid-x) (3 * mid-y) [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch mid-x mid-y [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch (3 * mid-x) mid-y [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch (- 3 * mid-x) mid-y [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
+  ask patch (- mid-x) mid-y [
+      let patches-to-paint patches in-radius sqrt((item 0 seedlist * dim / landscape) / pi)
+      ask patches-to-paint [ set habitat 1 ] ]
 end
 
-
-;; Generating a landscape
 to landscape-random ;
 
   let i 0
@@ -273,7 +264,6 @@ end
 
 
 ;; paintting ;; post simulations
-;;
 to paint-patch-use
   let max-use max [visits] of patches
   ask patches [set pcolor scale-color red visits max-use  1]
@@ -488,7 +478,7 @@ Proportion-of-habitat
 Proportion-of-habitat
 10
 100
-25.0
+85.0
 5
 1
 NIL
@@ -606,8 +596,8 @@ CHOOSER
 430
 landscape
 landscape
-"random" 1 8 16
-1
+"random" 1 2 4 8 16
+0
 
 BUTTON
 5
