@@ -314,11 +314,11 @@ end
 GRAPHICS-WINDOW
 260
 30
-618
-389
+617
+388
 -1
 -1
-3.5
+4.216867469879518
 1
 10
 1
@@ -329,9 +329,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-99
+82
 0
-99
+82
 0
 0
 1
@@ -446,7 +446,7 @@ dim
 dim
 10
 100
-100.0
+83.0
 10
 1
 NIL
@@ -478,7 +478,7 @@ Proportion-of-habitat
 Proportion-of-habitat
 10
 100
-85.0
+50.0
 5
 1
 NIL
