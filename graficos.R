@@ -89,9 +89,13 @@ ggplot(myd_random1, aes(prop.habitat, assess.top.sections, col=assess.top.sectio
   
 
 
-setwd("~/Dropbox/IBMs/IBibsM/Images")
-ggsave("Random_lands.tiff", width=18, height=14, units="cm", dpi=150, device = grDevices::tiff,)
+# setwd("~/Dropbox/IBMs/IBibsM/Images")
+# ggsave("Random_lands.tiff", width=18, height=14, units="cm", dpi=150, device = grDevices::tiff,)
 
 
+#### 
+glm(assess.top.sections ~ mean_hab_neighbors, data = myd_regular)
+glm(assess.top.sections ~ mean_hab_neighbors, data = myd_regular1)
+glm(assess.top.sections ~ mean_hab_neighbors, data = myd_regular)
 
 
