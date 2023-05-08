@@ -35,10 +35,8 @@ to setup
   set seedlist list Proportion-of-habitat (100 - Proportion-of-habitat)
    if sum seedlist != ext [
     let c ext / sum seedlist
-    print c
     set seedlist map floor (map [ ?1 -> c * ?1 ] seedlist)
     let change ((item 0 seedlist) + ext - sum seedlist)
-    print change
     set seedlist replace-item 0 seedlist change
   ]
 
@@ -209,7 +207,8 @@ to landscape-random ;
       ]
     ]
   ]
-
+ print count patches with [habitat = 1]
+ print count patches with [habitat = 2]
 end
 
 
@@ -314,8 +313,8 @@ end
 GRAPHICS-WINDOW
 260
 30
-617
-388
+618
+389
 -1
 -1
 4.216867469879518
