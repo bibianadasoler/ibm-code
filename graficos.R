@@ -2,6 +2,7 @@ library(dplyr)
 library(ggplot2)
 library(readxl)
 library(viridis)
+library(gridExtra)
 
 
 #===========################# REGULAR LANDSCAPE ##########################
@@ -33,20 +34,22 @@ ggplot(myd_regular1, aes(factor(perceptual.range), factor(matrix.permeability), 
   scale_fill_viridis("Hotspot\nlikelihood") +
   labs(title = "Hotspots", x="Perceptual range", y="Matrix permeability")
 
-ggplot(myd_regular1, aes(factor(perceptual.range), factor(matrix.permeability), fill=crossings)) +
+(crossingsmean <- ggplot(myd_regular1, aes(factor(perceptual.range), factor(matrix.permeability), fill=crossings)) +
   geom_raster() +
-  facet_wrap(~type_scenario) +
+  facet_wrap(~type_scenario, ncol=1) +
   theme_minimal() +
   scale_fill_viridis("N Crossings") +
-  labs(title = "Crossings", x="Perceptual range", y="Matrix permeability")
+  labs(title = "Crossings", x="Perceptual range", y="Matrix permeability"))
 
 
-ggplot(myd_regular1, aes(factor(perceptual.range), factor(matrix.permeability), fill=crossings_sd)) +
+(crossings_sd <- ggplot(myd_regular1, aes(factor(perceptual.range), factor(matrix.permeability), fill=crossings_sd)) +
   geom_raster() +
-  facet_wrap(~type_scenario) +
+  facet_wrap(~type_scenario, ncol = 1) +
   theme_minimal() +
   scale_fill_viridis("SD Crossings") +
-  labs(title = "Crossings", x="Perceptual range", y="Matrix permeability")
+  labs(title = "SD Crossings", x="Perceptual range", y="Matrix permeability"))
+
+grid.arrange(crossingsmean, crossings_sd, ncol = 2)
 
 #===========################# RANDOM LANDSCAPE ###########################
 

@@ -59,8 +59,9 @@ to setup
   reset-ticks
 
   ; id to save the landscape configuration
-  let random-code (random 9000 + 1000)
-  set run-id random-code
+  let random-code random 90000
+
+  set run-id word random-code (one-of ["A" "B" "C" "D" "E"])
 
   if save-data? [set-filename]
 
@@ -196,6 +197,8 @@ to create-scenario-6
 
   ask turtles [set heading 90 repeat 83  [fd 1 ask patch-here [set habitat 1]]]
 
+  ct
+
 end
 
 to create-random
@@ -228,7 +231,7 @@ end
 to setup-turtles
   create-turtles number-of-individuals [set color black
     set size 1]
-  ask turtles [ move-to rnd:weighted-one-of patches [permeability]
+  ask turtles [ move-to one-of patches with [habitat = 1 ]
       if pd? [pd]]
 
 end
@@ -362,7 +365,8 @@ to save-data
   file-close
   if scenario = "random" [
     let raster gis:patch-dataset habitat
-    gis:store-dataset raster (word root "/" run-id ".asc")
+    gis:store-dataset raster (word root "/rasters/" run-id ".asc")
+
   ]
 
 end
@@ -468,7 +472,7 @@ INPUTBOX
 130
 235
 steps
-1000.0
+1.0
 1
 0
 Number
@@ -482,7 +486,7 @@ matrix-permeability
 matrix-permeability
 .1
 1
-0.9
+0.2
 .1
 1
 NIL
@@ -525,7 +529,7 @@ Proportion-of-habitat
 Proportion-of-habitat
 10
 100
-90.0
+50.0
 5
 1
 NIL
@@ -617,10 +621,10 @@ SLIDER
 438
 perceptual-range
 perceptual-range
-2
+0
 20
 20.0
-2
+5
 1
 NIL
 HORIZONTAL
@@ -724,11 +728,11 @@ sum [visits] of patches with [habitat = 0]
 CHOOSER
 5
 480
-282
+275
 525
 root
 root
-"/Users/bibianaterra/Desktop/results"
+"/Users/bibianaterra/Library/CloudStorage/OneDrive-Personal/Doutorado/Predicao_ferrovias/ibm-code/results"
 0
 
 BUTTON
@@ -1112,7 +1116,7 @@ NetLogo 6.3.0
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="teste-random-impares" repetitions="20" sequentialRunOrder="false" runMetricsEveryStep="false">
+  <experiment name="teste-random" repetitions="50" sequentialRunOrder="false" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
     <enumeratedValueSet variable="root">
@@ -1147,9 +1151,13 @@ NetLogo 6.3.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="Proportion-of-habitat">
       <value value="10"/>
+      <value value="20"/>
       <value value="30"/>
+      <value value="40"/>
       <value value="50"/>
+      <value value="60"/>
       <value value="70"/>
+      <value value="80"/>
       <value value="90"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="save-data?">
@@ -1210,56 +1218,6 @@ NetLogo 6.3.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="output-file">
       <value value="&quot;teste&quot;"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="teste-random-pares" repetitions="20" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <metric>count turtles</metric>
-    <enumeratedValueSet variable="root">
-      <value value="&quot;/Users/bibianaterra/Desktop/results&quot;"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="number-of-individuals">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="steps">
-      <value value="1000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="perceptual-range">
-      <value value="5"/>
-      <value value="10"/>
-      <value value="15"/>
-      <value value="20"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="scenario">
-      <value value="&quot;random&quot;"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="matrix-permeability">
-      <value value="0.1"/>
-      <value value="0.2"/>
-      <value value="0.3"/>
-      <value value="0.4"/>
-      <value value="0.5"/>
-      <value value="0.6"/>
-      <value value="0.7"/>
-      <value value="0.8"/>
-      <value value="0.9"/>
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Proportion-of-habitat">
-      <value value="20"/>
-      <value value="40"/>
-      <value value="60"/>
-      <value value="80"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="save-data?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="pd?">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="output-file">
-      <value value="&quot;teste_random&quot;"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
