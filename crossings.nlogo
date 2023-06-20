@@ -1,19 +1,17 @@
 extensions [
-  gis
   rnd
-  csv
 ]
 
 
 globals[
   seedlist
   filename
-  run-id
-]
+ ]
 
 patches-own [
   habitat
   permeability
+  current_permeability
   visits
   hab_neighbors
 ]
@@ -29,21 +27,20 @@ to setup
   ca
   resize-world 0 83 0 83
   set-patch-size 4
-  gis:set-world-envelope [ 0 83 0 83 ]
 
   ask patches [
     set habitat nobody
     set visits 0
   ]
 
-  if scenario = 1 [create-scenario-1]
-  if scenario = "2-v" [create-scenario-2-vert]
-  if scenario = "2-h" [create-scenario-2-horiz]
-  if scenario = 3 [create-scenario-3]
-  if scenario = 4 [create-scenario-4]
-  if scenario = 5 [create-scenario-5]
-  if scenario = 6 [create-scenario-6]
-  if scenario = "random" [create-random]
+  if scenario = 1 [create-scenario-1] ;"1 patch"
+  if scenario = 2 [create-scenario-2-vert] ;"2 vertical patches"
+  if scenario = 3 [create-scenario-2-horiz] ;"2 horizontal patches"
+  if scenario = 4 [create-scenario-16-close] ;"16 pacthes close to road"
+  if scenario = 5 [create-scenario-16-far] ;"16 pacthes away from road"
+  if scenario = 6 [create-scenario-vert-lines] ;"vertical lines"
+  if scenario = 7 [create-scenario-horiz-lines] ;"horizontal lines"
+  if scenario = 8 [create-random] ;"random"
 
   ask patches with [habitat = 1] [set permeability 1
     set pcolor green]
@@ -58,13 +55,7 @@ to setup
   setup-turtles
   reset-ticks
 
-  ; id to save the landscape configuration
-  let random-code random 90000
-
-  set run-id word random-code (one-of ["A" "B" "C" "D" "E"])
-
   if save-data? [set-filename]
-
 end
 
 to create-scenario-1
@@ -74,26 +65,20 @@ to create-scenario-1
 
   ask turtles [set heading 0]
   ask turtles [ repeat 19  [fd 1 ask patch-here [set habitat 1]]]
-
   ask turtles [fd 1]
-
   ask turtles [ repeat 20  [fd 1 ask patch-here [set habitat 1]]]
   ct
 end
 
 to create-scenario-2-vert
-
   ask (patch 46 22) [sprout 1]
   ask (patch 15 22) [sprout 1]
 
   ask turtles [set heading 90]
   ask turtles [ repeat 20  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
-
   ask turtles [set heading 0]
   ask turtles [ repeat 19  [fd 1 ask patch-here [set habitat 1]]]
-
   ask turtles [fd 1]
-
   ask turtles [ repeat 20  [fd 1 ask patch-here [set habitat 1]]]
 
   ct
@@ -105,14 +90,13 @@ to create-scenario-2-horiz
 
   ask turtles [set heading 90]
   ask turtles [ repeat 40  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
-
   ask turtles [set heading 0]
   ask turtles [ repeat 19  [fd 1 ask patch-here [set habitat 1]]]
 
   ct
 end
 
-to create-scenario-3
+to create-scenario-16-close
   ask (patch 5 11) [sprout 1]
   ask (patch 26 11) [sprout 1]
   ask (patch 47 11) [sprout 1]
@@ -120,26 +104,19 @@ to create-scenario-3
 
   ask turtles [set heading 90]
   ask turtles [ repeat 10  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
-
   ask turtles [set heading 0]
   ask turtles [repeat 9  [fd 1 ask patch-here [set habitat 1]]]
-
   ask turtles [fd 11]
-
   ask turtles [ repeat 10  [fd 1 ask patch-here [set habitat 1]]]
-
   ask turtles [fd 1]
-
   ask turtles [ repeat 10  [fd 1 ask patch-here [set habitat 1]]]
-
   ask turtles [fd 11]
-
   ask turtles [ repeat 10  [fd 1 ask patch-here [set habitat 1]]]
 
   ct
 end
 
-to create-scenario-4
+to create-scenario-16-far
   ask (patch 5 6) [sprout 1]
   ask (patch 26 6) [sprout 1]
   ask (patch 47 6) [sprout 1]
@@ -147,26 +124,19 @@ to create-scenario-4
 
   ask turtles [set heading 90]
   ask turtles [ repeat 10  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
-
   ask turtles [set heading 0]
   ask turtles [repeat 9  [fd 1 ask patch-here [set habitat 1]]]
-
   ask turtles [fd 11]
-
   ask turtles [ repeat 10  [fd 1 ask patch-here [set habitat 1]]]
-
   ask turtles [fd 11]
-
   ask turtles [ repeat 10  [fd 1 ask patch-here [set habitat 1]]]
-
   ask turtles [fd 11]
-
   ask turtles [ repeat 10  [fd 1 ask patch-here [set habitat 1]]]
 
   ct
 end
 
-to create-scenario-5
+to create-scenario-vert-lines
   ask (patch 7 0) [sprout 1]
   ask (patch 28 0) [sprout 1]
   ask (patch 49 0) [sprout 1]
@@ -174,19 +144,15 @@ to create-scenario-5
 
   ask turtles [set heading 90]
   ask turtles [ repeat 5  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
-
   ask turtles [set heading 0]
   ask turtles [repeat 41  [fd 1 ask patch-here [set habitat 1]]]
-
   ask turtles [fd 1]
-
   ask turtles [ repeat 41  [fd 1 ask patch-here [set habitat 1]]]
 
   ct
 end
 
-to create-scenario-6
-
+to create-scenario-horiz-lines
   ask (patch 0 10) [sprout 1]
   ask (patch 0 26) [sprout 1]
   ask (patch 0 52) [sprout 1]
@@ -194,11 +160,9 @@ to create-scenario-6
 
   ask turtles [set heading 0]
   ask turtles [ repeat 5  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
-
   ask turtles [set heading 90 repeat 83  [fd 1 ask patch-here [set habitat 1]]]
 
   ct
-
 end
 
 to create-random
@@ -231,13 +195,11 @@ end
 to setup-turtles
   create-turtles number-of-individuals [set color black
     set size 1]
-  ask turtles [ move-to one-of patches with [habitat = 1 ]
+  ask turtles [ move-to rnd:weighted-one-of patches [permeability]
       if pd? [pd]]
-
 end
 
 to new-run
-
   ask turtles [die]
   ask patches with [habitat = 1] [set permeability 1
     set pcolor green]
@@ -255,10 +217,8 @@ to new-run
 end
 
 to go
-
   move tick
   if stop-simulation? [if save-data? [save-data] stop]
-
 end
 
 
@@ -275,20 +235,21 @@ to move
 end
 
 to check-move
-  let candidate-patches patches in-cone perceptual-range 180
+  let candidate-patches patches in-cone perceptual-range vision-angle
   if (count candidate-patches = 1) [
    ask turtles-on candidate-patches [face patch (max-pxcor / 2) (max-pycor / 2)]
-    let temp-patches patches in-cone perceptual-range 180
+    let temp-patches patches in-cone perceptual-range 120
     set candidate-patches temp-patches
   ]
-  let chosen-patch rnd:weighted-one-of candidate-patches [permeability]
+  ask candidate-patches [let d distance myself
+    set current_permeability permeability * ((1 / perceptual-range) + ((perceptual-range - d)/ (perceptual-range)))
+    ;set pcolor scale-color red current_permeability 1 0
+  ]
+  let chosen-patch rnd:weighted-one-of candidate-patches [current_permeability]
   set mycandidate chosen-patch
-
-
-
 end
 
-;; paintting ;; post simulations
+;; paintting post simulations
 to paint-patch-use
   let max-use max [visits] of patches
   ask patches [set pcolor scale-color red visits max-use  1]
@@ -310,16 +271,14 @@ to update-permeability
   ask patches with [habitat = 1] [set permeability 1]
   ask patches with [habitat = 2] [set permeability matrix-permeability]
   ask patches [set visits 0]
-
 end
 
 to-report assess-top-sections
-
   let sort-crossings sort-by > [visits] of patches with [habitat = 0]
   let total-crossings sum sort-crossings
 
   ifelse total-crossings > 0 [
-  let top-sections-effectiveness sum (sublist sort-crossings 0 (max-pycor * .25))
+  let top-sections-effectiveness sum (sublist sort-crossings 0 (max-pycor * .25)) ; QUE ESTA ACONTECENDO
   let effectiveness top-sections-effectiveness / total-crossings
     report precision effectiveness 3]
   [report 0]
@@ -332,7 +291,6 @@ to set-filename
    [ set filename (word root "/" output-file ".csv")
      file-open filename
      file-print (word
-       "run-id" ","
        "N_individuals" ","
        "steps" ","
        "landscape_area" ","
@@ -351,8 +309,9 @@ end
 
 to save-data
   file-open filename
-  file-print (word run-id "," number-of-individuals "," steps
-    "," (count patches) ","
+  file-print (word number-of-individuals ","
+    steps ","
+    (count patches) ","
     count patches with [habitat = 1] ","
     count patches with [habitat = 2] ","
     scenario ","
@@ -363,12 +322,6 @@ to save-data
     sum [visits] of patches with [habitat = 0] ","
     assess-top-sections)
   file-close
-  if scenario = "random" [
-    let raster gis:patch-dataset habitat
-    gis:store-dataset raster (word root "/rasters/" run-id ".asc")
-
-  ]
-
 end
 
 to delete-file
@@ -472,7 +425,7 @@ INPUTBOX
 130
 235
 steps
-1.0
+10.0
 1
 0
 Number
@@ -486,7 +439,7 @@ matrix-permeability
 matrix-permeability
 .1
 1
-0.2
+0.1
 .1
 1
 NIL
@@ -499,7 +452,7 @@ SWITCH
 148
 pd?
 pd?
-1
+0
 1
 -1000
 
@@ -523,10 +476,10 @@ NIL
 SLIDER
 5
 290
-165
+192
 323
-Proportion-of-habitat
-Proportion-of-habitat
+proportion-of-habitat
+proportion-of-habitat
 10
 100
 50.0
@@ -623,7 +576,7 @@ perceptual-range
 perceptual-range
 0
 20
-20.0
+5.0
 5
 1
 NIL
@@ -632,12 +585,12 @@ HORIZONTAL
 CHOOSER
 5
 240
-143
+217
 285
 scenario
 scenario
-1 "2-v" "2-h" 3 4 5 6 "random"
-7
+1 2 3 4 5 6 7 8
+2
 
 MONITOR
 655
@@ -646,17 +599,6 @@ MONITOR
 315
 matrix
 count patches with [habitat = 2]
-1
-1
-11
-
-MONITOR
-655
-320
-712
-365
-habitat
-count patches with [habitat = 1]
 1
 1
 11
@@ -671,20 +613,10 @@ TEXTBOX
 104.0
 1
 
-TEXTBOX
-730
-330
-760
-348
-1600
-11
-92.0
-1
-
 INPUTBOX
 285
 480
-365
+450
 540
 output-file
 teste_random
@@ -706,7 +638,7 @@ save-data?
 MONITOR
 330
 545
-690
+1130
 590
 NIL
 filename
@@ -732,7 +664,7 @@ CHOOSER
 525
 root
 root
-"/Users/bibianaterra/Library/CloudStorage/OneDrive-Personal/Doutorado/Predicao_ferrovias/ibm-code/results"
+"/Users/bibianaterra/Library/CloudStorage/OneDrive-Personal/Doutorado/Predicao_ferrovias/ibm-code/results" "C:\\Users\\bibia\\OneDrive\\Doutorado\\Predicao_ferrovias\\ibm-code\\results"
 0
 
 BUTTON
@@ -768,6 +700,42 @@ NIL
 NIL
 NIL
 1
+
+TEXTBOX
+730
+330
+760
+348
+1600
+11
+92.0
+1
+
+MONITOR
+655
+320
+712
+365
+habitat
+count patches with [habitat = 1]
+1
+1
+11
+
+SLIDER
+5
+440
+177
+473
+vision-angle
+vision-angle
+90
+180
+120.0
+30
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1111,7 +1079,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.3.0
+NetLogo 6.0.4
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
