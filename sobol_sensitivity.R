@@ -5,7 +5,7 @@ Sys.setenv(JAVA_HOME = "/Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Ho
 #### STEP 1: create a nl object -----
 netlogopath.mac <- file.path("/Applications/NetLogo 6.0.4")
 modelpath.mac <- file.path("/Users/bibianaterra/Library/CloudStorage/OneDrive-Personal/Doutorado/Predicao_ferrovias/ibm-code/crossings.nlogo")
-outpath.mac <- file.path("/Users/bibianaterra/Library/CloudStorage/OneDrive-Personal/Doutorado/Predicao_ferrovias/ibm-code/results/")
+outpath.mac <- file.path("~/results")
 nl.sobol.random <- nl(nlversion = "6.0.4",
                       nlpath = netlogopath.mac,
                       modelpath = modelpath.mac,
@@ -17,12 +17,12 @@ report_model_parameters(nl.sobol.random)
 
 #### STEP 2 experiment----
 nl.sobol.random@experiment <- experiment(expname = "sobol.random-raw",
-                                         outpath = outpath.mac,
+                                         outpath = "/Users/bibianaterra/Library/CloudStorage/OneDrive-Personal/Doutorado/Predicao_ferrovias/ibm-code/results",
                                          repetition = 1,
                                          tickmetrics = "false",
                                          idsetup = "setup",
                                          idgo = "go",
-                                         stopcond = "ticks = steps",
+                                         runtime = 700,
                                          metrics = c("(count patches)", 
                                                      "count patches with [habitat = 1]",
                                                      "count patches with [habitat = 2]",
@@ -33,11 +33,10 @@ nl.sobol.random@experiment <- experiment(expname = "sobol.random-raw",
                                                           "matrix-permeability" = list(min = 0.1, max = 0.9, step = 0.1, qfun = "runif"),
                                                           "perceptual-range" = list(min = 5, max = 20, step = 5, qfun = "runif"),
                                                           "vision-angle" = list(min = 90, max = 180, qfun = "qunif")),
-                                         constants = list("number-of-individuals" = 10,
-                                                          "steps" = 10,
+                                         constants = list("number-of-individuals" = 50,
+                                                          "steps" = 700,
                                                           "scenario" = 8,
-                                                          "save-data?" = "true",
-                                                          "output-file" = "sobol_random"))
+                                                          "save-data?" = "true"))
 eval_variables_constants(nl.sobol.random)
 
 #### STEP 3 simulation design----
@@ -48,8 +47,8 @@ nl.sobol.random@simdesign <- simdesign_sobol(nl = nl.sobol.random,
                                              sobolconf = 0.95,
                                              nseeds = 1,
                                              precision = 4)
-nl.sobol.random@simdesign@siminput 
-teste <- run_nl_one(nl.sobol.random, getsim(nl.sobol.random,"simseeds")[1], 120)
+#nl.sobol.random@simdesign@siminput 
+teste <- run_nl_one(nl.sobol.random, getsim(nl.sobol.random,"simseeds")[1], 2)
 #### STEP 4 run simulation----
 library(future)
 plan(multisession)

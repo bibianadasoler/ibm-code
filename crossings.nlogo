@@ -286,9 +286,9 @@ end
 
 ;;; save data
 to set-filename
-  ifelse file-exists? (word root "/" output-file ".csv")
-   [ set filename (word root "/" output-file ".csv") ]
-   [ set filename (word root "/" output-file ".csv")
+  ifelse file-exists? (word root "/" outputfile ".csv")
+   [ set filename (word root "/" outputfile ".csv") ]
+   [ set filename (word root "/" outputfile ".csv")
      file-open filename
      file-print (word
        "N_individuals" ","
@@ -380,7 +380,7 @@ INPUTBOX
 130
 175
 number-of-individuals
-100.0
+10.0
 1
 0
 Number
@@ -425,7 +425,7 @@ INPUTBOX
 130
 235
 steps
-10.0
+100.0
 1
 0
 Number
@@ -439,7 +439,7 @@ matrix-permeability
 matrix-permeability
 .1
 1
-0.1
+0.2
 .1
 1
 NIL
@@ -452,7 +452,7 @@ SWITCH
 148
 pd?
 pd?
-0
+1
 1
 -1000
 
@@ -482,7 +482,7 @@ proportion-of-habitat
 proportion-of-habitat
 10
 100
-50.0
+30.0
 5
 1
 NIL
@@ -576,7 +576,7 @@ perceptual-range
 perceptual-range
 0
 20
-5.0
+10.0
 5
 1
 NIL
@@ -590,7 +590,7 @@ CHOOSER
 scenario
 scenario
 1 2 3 4 5 6 7 8
-2
+7
 
 MONITOR
 655
@@ -618,8 +618,8 @@ INPUTBOX
 480
 450
 540
-output-file
-teste_random
+outputfile
+valendo
 1
 0
 String

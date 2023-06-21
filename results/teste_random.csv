@@ -1,1 +1,2 @@
 N_individuals,steps,landscape_area,habitat_area,matrix_area,type_scenario,proportion_habitat_random,perceptual-range,matrix-permeability,mean_hab_neighbors,total_crossings,assess-top-sections
+50,700,7056,5211,1761,8,76.9178,12.44,0.8716,4.0476190476190474,464,0.418
