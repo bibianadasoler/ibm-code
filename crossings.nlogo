@@ -1,11 +1,13 @@
 extensions [
   rnd
+  gis
 ]
 
 
 globals[
   seedlist
   filename
+  run-id
  ]
 
 patches-own [
@@ -27,6 +29,7 @@ to setup
   ca
   resize-world 0 83 0 83
   set-patch-size 4
+  gis:set-world-envelope [ 0 83 0 83 ]
 
   ask patches [
     set habitat nobody
@@ -54,6 +57,10 @@ to setup
 
   setup-turtles
   reset-ticks
+
+  ; id to save the landscape configuration
+  let random-code random 9999999
+  set run-id word random-code (one-of ["A" "B" "C" "D" "E"])
 
   if save-data? [set-filename]
 end
@@ -291,6 +298,7 @@ to set-filename
    [ set filename (word root "/" outputfile ".csv")
      file-open filename
      file-print (word
+      "run-id" ","
        "N_individuals" ","
        "steps" ","
        "landscape_area" ","
@@ -309,7 +317,9 @@ end
 
 to save-data
   file-open filename
-  file-print (word number-of-individuals ","
+  file-print (word
+    run-id ","
+    number-of-individuals ","
     steps ","
     (count patches) ","
     count patches with [habitat = 1] ","
@@ -321,7 +331,13 @@ to save-data
     mean [hab_neighbors] of patches with [habitat = 0] ","
     sum [visits] of patches with [habitat = 0] ","
     assess-top-sections)
+
   file-close
+  if scenario = 8 [
+    let raster gis:patch-dataset habitat
+    gis:store-dataset raster (word root "/rasters/" run-id ".asc")
+
+  ]
 end
 
 to delete-file
@@ -380,7 +396,7 @@ INPUTBOX
 130
 175
 number-of-individuals
-10.0
+100.0
 1
 0
 Number
@@ -425,7 +441,7 @@ INPUTBOX
 130
 235
 steps
-100.0
+300.0
 1
 0
 Number
@@ -439,7 +455,7 @@ matrix-permeability
 matrix-permeability
 .1
 1
-0.2
+0.1
 .1
 1
 NIL
@@ -482,7 +498,7 @@ proportion-of-habitat
 proportion-of-habitat
 10
 100
-30.0
+10.0
 5
 1
 NIL
@@ -574,9 +590,9 @@ SLIDER
 438
 perceptual-range
 perceptual-range
-0
+5
 20
-10.0
+5.0
 5
 1
 NIL
@@ -619,7 +635,7 @@ INPUTBOX
 450
 540
 outputfile
-valendo
+ants
 1
 0
 String
@@ -731,7 +747,7 @@ vision-angle
 vision-angle
 90
 180
-120.0
+90.0
 30
 1
 NIL
