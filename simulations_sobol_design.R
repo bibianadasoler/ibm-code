@@ -63,6 +63,7 @@ progressr::handlers("progress")
 results_crossings <- progressr::with_progress(nlrx::run_nl_all(nl = nl_crossings))
 
 ### ATENCAO AO NUMERO DE SEEDS
+# seed1 <- getsim(nl_crossings, "simseeds")[1]
 # seed2 <- getsim(nl_crossings, "simseeds")[2]
 # seed3 <- getsim(nl_crossings, "simseeds")[3]
 # seed4 <- getsim(nl_crossings, "simseeds")[4]
