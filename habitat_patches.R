@@ -7,7 +7,7 @@ library(stringr)
 
 # lendo a pasta com os rasters para ver todos os arquivos
 rasters <- list.files(
-  path = "./results/rasters",
+  path = here("results", "rasters"),
   full.names = TRUE, #retorna o caminho completo do arquivo
   ignore.case = TRUE #ignora se o valor é maiúsculo ou minúsculo
 )
@@ -30,4 +30,16 @@ id_patches <- data.frame("run_id" = NA,
 for (i in 1:length(rasters)) ( 
   id_patches[i, ] <- raster_patches_numbers(rasters[i], class = 1)
   )
-write.csv(id_patches, file = "./results/id_pacthes.csv", row.names = F)
+write.csv(id_patches, file = here("results", "id_pacthes.csv"), row.names = F)
+
+id_cor <- id_pacthes %>%
+  mutate(id = gsub(".asc", "", id_pacthes$run_id)) %>%
+  select(-run_id) %>%
+  rename(.,  run_id = id)
+id_cor$habitat_patches <- as.integer(id_cor$habitat_patches)
+
+
+corrrrr <- left_join(id_cor, salvo_netlogo, by = "run_id")
+cor.test(corrrrr$habitat_patches, corrrrr$proportion_of_habitat)
+plot(corrrrr$proportion_of_habitat, corrrrr$habitat_patches)
+boxplot(corrrrr$proportion_of_habitat ~ corrrrr$habitat_patches)

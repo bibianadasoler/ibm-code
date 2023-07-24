@@ -29,7 +29,7 @@ report_model_parameters(nl_crossings)
 
 nl_crossings@experiment <- experiment(expname = "sobol_scenario8",
                             outpath = here(),
-                            repetition = 2,      
+                            repetition = 1,      
                             tickmetrics = "false",
                             idsetup = "setup",   
                             idgo = "go",         
@@ -45,7 +45,7 @@ nl_crossings@experiment <- experiment(expname = "sobol_scenario8",
 eval_variables_constants(nl_crossings)
 
 nl_crossings@simdesign <- simdesign_sobol(nl = nl_crossings,
-                                   samples = 1000,
+                                   samples = 3000,
                                    sobolorder = 2,
                                    sobolnboot = 1000,
                                    sobolconf = 0.95,
@@ -81,7 +81,7 @@ results_crossings <- progressr::with_progress(nlrx::run_nl_all(nl = nl_crossings
 setsim(nl_crossings, "simoutput") <- results_crossings
 
 # Store nl object
-saveRDS(nl_crossings, here("results", "sobol.rds"))
+saveRDS(nl_crossings, here("results", "amostras3000.rds"))
 # 
 # # Sobol indices:
 # sobol.out<- analyze_nl(nl_crossings)

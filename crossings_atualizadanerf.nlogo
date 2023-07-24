@@ -23,7 +23,7 @@ turtles-own [
 ]
 
 
-;;------------------------------ setting up -----------------------------------------------
+;;------------------------------ setting up ----------------------------------------------
 
 to setup
   ca
@@ -338,11 +338,11 @@ to save_data
     assess_top_sections)
 
   file-close
-  if scenario = 8 [
-    let raster gis:patch-dataset habitat
-    gis:store-dataset raster (word root "\\rasters\\" run_id ".asc")
-
-  ]
+;  if scenario = 8 [
+;    let raster gis:patch-dataset habitat
+;    gis:store-dataset raster (word root "\\rasters\\" run_id ".asc")
+;
+;  ]
 end
 
 to delete_file
@@ -629,7 +629,7 @@ INPUTBOX
 450
 540
 outputfile
-sobol_teste
+teste3000
 1
 0
 String

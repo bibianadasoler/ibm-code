@@ -22,6 +22,7 @@ tell(sensitivity_assess, assess_values)
 print(sensitivity_assess)
 plot(sensitivity_assess)
 
+
 # corrigida 
 tell(sensitivity_assess, (assess_values-mean(assess_values))/sd(assess_values))
 print(sensitivity_assess)
