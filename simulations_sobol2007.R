@@ -10,9 +10,7 @@
 # Sensitivity analysis - Sobol based on ants_nlrx_script
 library(nlrx)
 library(dplyr)
-library(hrbrthemes)
 library(future)
-library(ggplot2)
 library(here)
 
 ## Step1: Create a nl obejct:
