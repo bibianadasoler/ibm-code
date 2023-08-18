@@ -37,17 +37,17 @@ nl_crossings@experiment <- experiment(expname = "sobol2007",
                             metrics = c("total_crossings",
                                         "assess_top_sections"),
                             variables = list("proportion_of_habitat" = list(min = 10, max = 90, qfun = "qunif"),
-                                             "matrix_permeability" = list(min = 0.1, max = 0.9, qfun = "qunif"),
+                                             "matrix_permeability" = list(min = 10, max = 90, qfun = "qunif"),
                                              "perceptual_range" = list(min = 5, max = 42, qfun = "qunif"),
                                              "vision_angle" = list(min = 90, max = 180, qfun = "qunif")))
 eval_variables_constants(nl_crossings)
 
 nl_crossings@simdesign <- simdesign_sobol2007(nl = nl_crossings,
-                                   samples = 3000,
+                                   samples = 7000,
                                    sobolnboot = 300,
                                    sobolconf = 0.95,
                                    nseeds = 1,
-                                   precision = 3)
+                                   precision = 0)
 
 nl_crossings@simdesign
 hist(nl_crossings@simdesign@siminput$proportion_of_habitat)
@@ -63,5 +63,5 @@ results_crossings <- progressr::with_progress(nlrx::run_nl_all(nl = nl_crossings
 setsim(nl_crossings, "simoutput") <- results_crossings
 
 # Store nl object
-saveRDS(nl_crossings, here("results", "sobol2007.rds"))
+saveRDS(nl_crossings, here("results", "sobol2007_7000.rds"))
 # 

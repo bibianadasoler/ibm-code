@@ -1,13 +1,11 @@
 extensions [
   rnd
-  gis
 ]
 
 
 globals[
   seedlist
   filename
-  run_id
  ]
 
 patches-own [
@@ -15,7 +13,6 @@ patches-own [
   permeability
   current_permeability
   visits
-  hab_neighbors
 ]
 
 turtles-own [
@@ -23,13 +20,12 @@ turtles-own [
 ]
 
 
-;;------------------------------ setting up ---------------------------------------------
+;;------------------------------ setting up --------------------------------------------
 
 to setup
   ca
   resize-world 0 83 0 83
   set-patch-size 4
-  gis:set-world-envelope [ 0 83 0 83 ]
 
   ask patches [
     set habitat nobody
@@ -45,22 +41,16 @@ to setup
   if scenario = 7 [create_scenario_horiz_lines] ;"horizontal lines"
   if scenario = 8 [create_random] ;"random"
 
-  ask patches with [habitat = 1] [set permeability 1
+  ask patches with [habitat = 1] [set permeability 100
     set pcolor green]
   ask patches with [habitat != 1] [set habitat 2 set permeability matrix_permeability
     set pcolor white]
   ask patches with [pycor = 42] [
     set habitat 0
     set pcolor black]
-  ask patches with [habitat = 0] [
-    set hab_neighbors count neighbors with [habitat = 1] ]
 
   setup_turtles
   reset-ticks
-
-  ; id to save the landscape configuration
-  let random_code random 999999999999999
-  set run_id word random_code (one-of ["A" "B" "C" "D" "E"])
 
   if save_data? [set_filename]
 end
@@ -207,7 +197,7 @@ end
 
 to new_run
   ask turtles [die]
-  ask patches with [habitat = 1] [set permeability 1
+  ask patches with [habitat = 1] [set permeability 100
     set pcolor green]
   ask patches with [habitat != 1] [set habitat 2 set permeability matrix_permeability
     set pcolor white]
@@ -249,7 +239,6 @@ to check_move
   ]
   ask candidate_patches [let d distance myself
     set current_permeability permeability * ((1 / perceptual_range) + ((perceptual_range - d)/ (perceptual_range)))
-    ;set pcolor scale_color red current_permeability 1 0
   ]
   set chosen_patch rnd:weighted-one-of candidate_patches [current_permeability]
 end
@@ -273,7 +262,7 @@ to paint_habitats
 end
 
 to update_permeability
-  ask patches with [habitat = 1] [set permeability 1]
+  ask patches with [habitat = 1] [set permeability 100]
   ask patches with [habitat = 2] [set permeability matrix_permeability]
   ask patches [set visits 0]
 end
@@ -301,7 +290,6 @@ to set_filename
    [ set filename (word root "\\" outputfile ".csv")
      file-open filename
      file-print (word
-      "run_id" ","
        "N_individuals" ","
        "steps" ","
        "landscape_area" ","
@@ -312,7 +300,6 @@ to set_filename
        "matrix_permeability" ","
        "perceptual_range" ","
        "vision_angle" ","
-       "mean_hab_neighbors" ","
        "total_crossings" ","
        "assess_top_sections")
      file-close-all
@@ -322,7 +309,6 @@ end
 to save_data
   file-open filename
   file-print (word
-    run_id ","
     number_of_individuals ","
     steps ","
     (count patches) ","
@@ -333,16 +319,10 @@ to save_data
     matrix_permeability ","
     perceptual_range ","
     vision_angle ","
-    mean [hab_neighbors] of patches with [habitat = 0] ","
     total_crossings ","
     assess_top_sections)
 
   file-close
-;  if scenario = 8 [
-;    let raster gis:patch-dataset habitat
-;    gis:store-dataset raster (word root "\\rasters\\" run_id ".asc")
-;
-;  ]
 end
 
 to delete_file
@@ -458,10 +438,10 @@ SLIDER
 363
 matrix_permeability
 matrix_permeability
-0.1
-0.9
-0.1
-0.1
+10
+90
+10.0
+10
 1
 NIL
 HORIZONTAL
@@ -641,7 +621,7 @@ SWITCH
 578
 save_data?
 save_data?
-0
+1
 1
 -1000
 
@@ -674,7 +654,7 @@ CHOOSER
 525
 root
 root
-"/Users/bibianaterra/Library/CloudStorage/OneDrive-Personal/Doutorado/Predicao_ferrovias/ibm-code/results" "C:\\Users\\bibia\\OneDrive\\Doutorado\\Predicao_ferrovias\\ibm-code\\results\\"
+"/Users/bibianaterra/Library/CloudStorage/OneDrive-Personal/Doutorado/Predicao_ferrovias/ibm-code/results" "C:\\Users\\BIO\\Desktop\\bibs"
 1
 
 BUTTON
