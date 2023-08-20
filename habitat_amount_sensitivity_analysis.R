@@ -7,7 +7,7 @@ library(gridExtra)
 # obter inputs do objeto netlogo para adicionar na analise de sensibilidade
 # carregar o objeto netlogo - pasta results, arquivo habitat_amount_simulations.rds
 # inputs
-habitat_amount_simulations <- readRDS(here("results", "habitat_amount_simulations2.rds"))
+habitat_amount_simulations <- readRDS(here("results", "habitat_amount_6000amostras1.rds"))
 random_sample_1 <- habitat_amount_simulations@simdesign@simobject[[1]][["X1"]]
 random_sample_2 <- habitat_amount_simulations@simdesign@simobject[[1]][["X2"]]
 experiment_design <- habitat_amount_simulations@simdesign@siminput
@@ -38,12 +38,17 @@ assess_graph <- rbind(assess_first_graph, assess_total_graph)
                    position = position_dodge(width = 0.3), size = 0.3) +
   scale_colour_manual(values = c("first-order" = "black", "total" = "grey50"),
                       labels = c("First-order index", "Total index"), name = " ") +
-  labs(title = "Asses top sections", y = "Parameter", x = "Sobol Index") +
+  labs(title = "Asses top sections", y = "Parameters", x = "Sobol Index") +
   scale_x_continuous(limits = c(0, 1)) +
-  scale_y_discrete(limits = c( "proportion_of_habitat", "perceptual_range", "vision_angle", "matrix_permeability"),
+  scale_y_discrete(limits = c("perceptual_range", "vision_angle", "proportion_of_habitat", "matrix_permeability"),
                    labels=c("vision_angle" = "Vision angle", "proportion_of_habitat" = "Proportion of habitat",
                             "perceptual_range" = "Perceptual range", "matrix_permeability" = "Matrix permeability")) +
-  theme(legend.position = "bottom") )
+    theme(panel.background = element_rect(fill = "white"), 
+          legend.key = element_rect(fill = "white"),
+          axis.line = element_line(color = "black"),
+          panel.grid.major.y = element_line(colour = "grey99"),
+          legend.position = "bottom")
+)
 
 # total crossings
 sensitivity_crossings <- sobol2007(model = NULL, X1 = random_sample_1, X2 = random_sample_2, nboot = 300) 
@@ -70,29 +75,14 @@ crossings_graph <- rbind(crossings_first_graph, crossings_total_graph) %>%
                       labels = c("First-order index", "Total index"), name = " ") +
   labs(title = "Total crossings", y = "Parameter", x = "Sobol Index") +
   scale_x_continuous(limits = c(0, 1)) +
-  scale_y_discrete(limits = c("vision_angle", "matrix_permeability", "proportion_of_habitat", "perceptual_range"),
+  scale_y_discrete(limits = c("matrix_permeability", "vision_angle", "proportion_of_habitat", "perceptual_range"),
                   labels=c("vision_angle" = "Vision angle", "proportion_of_habitat" = "Proportion of habitat",
                           "perceptual_range" = "Perceptual range", "matrix_permeability" = "Matrix permeability")) +
-   theme(legend.position = "bottom") )
+    theme(panel.background = element_rect(fill = "white"),
+          legend.key = element_rect(fill = "white"),
+          axis.line = element_line(color = "black"),
+          panel.grid.major.y = element_line(colour = "grey99"),
+          legend.position = "bottom")
+)
 
 grid.arrange(sensi_assess, sensi_cross, ncol = 1)
-
-
-hist(habitat_amount_simulations1@simdesign@siminput$proportion_of_habitat)
-table(habitat_amount_simulations1@simdesign@siminput$proportion_of_habitat)
-hist(habitat_amount_simulations@simdesign@siminput$proportion_of_habitat)
-table(habitat_amount_simulations@simdesign@siminput$proportion_of_habitat)
-
-hist(habitat_amount_simulations@simdesign@siminput$matrix_permeability)
-table(habitat_amount_simulations@simdesign@siminput$matrix_permeability)
-hist(habitat_amount_simulations1@simdesign@siminput$matrix_permeability)
-table(habitat_amount_simulations1@simdesign@siminput$matrix_permeability)
-
-
-hist(habitat_amount_simulations@simdesign@siminput$perceptual_range)
-table(habitat_amount_simulations@simdesign@siminput$perceptual_range)
-hist(habitat_amount_simulations1@simdesign@siminput$perceptual_range)
-table(habitat_amount_simulations1@simdesign@siminput$perceptual_range)
-
-hist(configuration_simulations@simdesign@siminput$matrix_permeability)
-table(configuration_simulations@simdesign@siminput$matrix_permeability)

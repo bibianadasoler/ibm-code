@@ -43,7 +43,12 @@ assess_graph <- rbind(assess_first_graph, assess_total_graph)
     scale_y_discrete(limits = c("vision_angle", "perceptual_range", "scenario", "matrix_permeability"),
                      labels=c("vision_angle" = "Vision angle", "scenario" = "Scenarios",
                               "perceptual_range" = "Perceptual range", "matrix_permeability" = "Matrix permeability")) +
-    theme(legend.position = "bottom") )
+    theme(panel.background = element_rect(fill = "white"), 
+          legend.key = element_rect(fill = "white"),
+          axis.line = element_line(color = "black"),
+          panel.grid.major.y = element_line(colour = "grey99"),
+          legend.position = "bottom")
+)
 
 
 # total crossings
@@ -73,6 +78,11 @@ crossings_graph <- rbind(crossings_first_graph, crossings_total_graph) %>%
     scale_y_discrete(limits = c("vision_angle", "matrix_permeability", "perceptual_range", "scenario"),
                      labels=c("vision_angle" = "Vision angle", "scenario" = "Scenarios",
                               "perceptual_range" = "Perceptual range", "matrix_permeability" = "Matrix permeability")) +
-    theme(legend.position = "bottom") )
+    theme(panel.background = element_rect(fill = "white"),
+          legend.key = element_rect(fill = "white"),
+          axis.line = element_line(color = "black"),
+          panel.grid.major.y = element_line(colour = "grey99"),
+          legend.position = "bottom")
+)
 
 grid.arrange(sensi_assess, sensi_cross, ncol = 1)

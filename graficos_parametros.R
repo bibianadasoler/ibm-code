@@ -10,7 +10,7 @@ library(ggdist)
 library(gridExtra)
 
 ### Submodel habitat amount ----
-
+habitat_amount_simulations <- habitat_amount_3000amostras2@simdesign@simoutput
 #### Assess top sections ----
 mean_assess_prop_habitat <- habitat_amount_simulations %>%
   group_by(proportion_of_habitat) %>%
@@ -127,7 +127,7 @@ mean_total_vision_habitat <- habitat_amount_simulations %>%
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "blue", linewidth = 0.5) +
    labs(y = "Total crossings road", x = "Proportion of habitat") +
-   scale_y_continuous(breaks =  c(0, 250, 500, 750, 1000, 1250, 1500, 1750), limits = c(0,1750)) +
+   scale_y_continuous(breaks =  c(0, 250, 500, 750, 1000, 1250, 1500, 1750, 2250), limits = c(0,2500)) +
    scale_x_continuous(breaks = c(10,25,50,75,90)) +
    theme(panel.background = element_rect(fill = "white"), 
          panel.border = element_rect(fill = NA, colour = "grey20"), 
@@ -140,7 +140,7 @@ mean_total_vision_habitat <- habitat_amount_simulations %>%
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "blue", linewidth = 0.5) +
    labs(y = "Total crossings road", x = "Matrix permeability") +
-   scale_y_continuous(breaks =  c(0, 250, 500, 750, 1000, 1250, 1500, 1750), limits = c(0,1750)) +
+   scale_y_continuous(breaks =  c(0, 250, 500, 750, 1000, 1250, 1500, 1750, 2250), limits = c(0,2500)) +
    scale_x_continuous(breaks = c(10,30,50,70,90)) +
    theme(panel.background = element_rect(fill = "white"), 
          panel.border = element_rect(fill = NA, colour = "grey20"), 
@@ -153,7 +153,7 @@ mean_total_vision_habitat <- habitat_amount_simulations %>%
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "blue", linewidth = 0.5) +
    labs(y = "Total crossings road", x = "Perceptual range") +
-   scale_y_continuous(breaks =  c(0, 250, 500, 750, 1000, 1250, 1500, 1750), limits = c(0,1750)) +
+   scale_y_continuous(breaks =  c(0, 250, 500, 750, 1000, 1250, 1500, 1750, 2250), limits = c(0,2500)) +
    scale_x_continuous(breaks = c(5, 15, 25, 35, 42)) +
    theme(panel.background = element_rect(fill = "white"), 
          panel.border = element_rect(fill = NA, colour = "grey20"), 
@@ -165,7 +165,7 @@ mean_total_vision_habitat <- habitat_amount_simulations %>%
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "blue", linewidth = 0.5) +
    labs(y = "Total crossings road", x = "Vision angle") +
-   scale_y_continuous(breaks =  c(0, 250, 500, 750, 1000, 1250, 1500, 1750), limits = c(0,1750)) +
+   scale_y_continuous(breaks =  c(0, 250, 500, 750, 1000, 1250, 1500, 1750, 2250), limits = c(0,2500)) +
    scale_x_continuous(breaks = c(90, 120, 150, 180)) +
    theme(panel.background = element_rect(fill = "white"), 
          panel.border = element_rect(fill = NA, colour = "grey20"), 
@@ -179,6 +179,7 @@ grid.arrange(assess_prop_habitat_amount, assess_perm_habitat_amount, assess_perc
 
 
 ### Submodel configuration ----
+configuration_simulations <- configuration_simulations@simdesign@simoutput
 #### Assess top sections ----
 mean_assess_perm_config <- configuration_simulations %>%
   group_by(matrix_permeability) %>%

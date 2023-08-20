@@ -1,28 +1,27 @@
 # ibm-code
 
-Modelo netlogo:
+pasta raiz:
 
-crossings_atualizadanerf.nlogo
-
-
-
+Modelo netlogo - crossings.nlogo
 
 Scripts:
 
-simulations_sobol_design - usado para fazer as simulacoes sem ser por dentro do netlogo - precisa ter o netlogo versao 6.0.4
+simulations - usado para fazer as simulacoes sem ser por dentro do netlogo - precisa ser o netlogo versao 6.0.4
 
-sensitivity_analysis - para fazer a analise de sensibilidade, metodo sobol, usando os resultados do script "simulations_sobol_design"
+sensitivity_analysis - para fazer a analise de sensibilidade, metodo sobol, usando os resultados do script "simulations_sobol_design" e graficos da sensibilidade
 
-habitat_patches - calcular n de patches
+grafico parametros - resultados dos parametros
 
-graficos e graficos2 - auto explicativo
-
-
+Arquivos word: 
+ODD
+Estrutura - outline do artigo
+Methods - parte dos metodos e resultados que comecei a escrever
 
 pasta results:
 
-sobol.rds = tem o resultado do script "simulations_sobol_design" (1000 amostras)
+arquivos .rds = tem o resultado das simulacoes como objeto nl (do pacote nlrx)
 
-inputs_and_outputs = tem todos os valores de tudo
+arquivos .csv = resultados salvos pelo netlogo
 
-sobol_teste = csv salvo pelo netlogo com as simulacoes (1000 amostras)
+pasta imagens:
+figuras dos resultados dos parametros e das analises de sensibilidade
