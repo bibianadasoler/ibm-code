@@ -10,7 +10,7 @@ library(ggdist)
 library(gridExtra)
 
 ### Submodel habitat amount ----
-habitat_amount_simulations <- habitat_amount_3000amostras2@simdesign@simoutput
+habitat_amount_simulations <- habitat_amount_6000amostras1@simdesign@simoutput
 #### Assess top sections ----
 mean_assess_prop_habitat <- habitat_amount_simulations %>%
   group_by(proportion_of_habitat) %>%

@@ -43,7 +43,7 @@ nl_crossings@experiment <- experiment(expname = "sobol2007",
 eval_variables_constants(nl_crossings)
 
 nl_crossings@simdesign <- simdesign_sobol2007(nl = nl_crossings,
-                                   samples = 7000,
+                                   samples = 6000,
                                    sobolnboot = 300,
                                    sobolconf = 0.95,
                                    nseeds = 1,

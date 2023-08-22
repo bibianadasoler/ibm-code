@@ -19,7 +19,6 @@ turtles-own [
   chosen_patch
 ]
 
-
 to setup
   ca
   resize-world 0 83 0 83
@@ -30,23 +29,23 @@ to setup
     set visits 0
   ]
 
-  ;; types of scenarios that will be generated
-  if scenario = 1 [create_scenario_1] ;"1 patch"
-  if scenario = 2 [create_scenario_2_vert] ;"2 vertical patches"
-  if scenario = 3 [create_scenario_2_horiz] ;"2 horizontal patches"
-  if scenario = 4 [create_scenario_16_close] ;"16 pacthes close to road"
-  if scenario = 5 [create_scenario_16_far] ;"16 pacthes away from road"
-  if scenario = 6 [create_scenario_vert_lines] ;"vertical lines"
-  if scenario = 7 [create_scenario_horiz_lines] ;"horizontal lines"
-  if scenario = 8 [create_random] ;"random"
+  ; types of scenarios that will be generated
+  if scenario = "Habitat amount" [create_random] ; "habitat amount"
+  if scenario = "Configuration - A" [create_scenario_A] ; "1 patch"
+  if scenario = "Configuration - B" [create_scenario_B] ; "2 vertical patches"
+  if scenario = "Configuration - C" [create_scenario_C] ; "2 horizontal patches"
+  if scenario = "Configuration - D" [create_scenario_D] ; "16 pacthes close to road"
+  if scenario = "Configuration - E" [create_scenario_E] ; "16 pacthes away from road"
+  if scenario = "Configuration - F" [create_scenario_F] ; "vertical lines"
+  if scenario = "Configuration - G" [create_scenario_G] ; "horizontal lines"
 
-  ;setup habitat patches
+  ; setup habitat patches
   ask patches with [habitat = 1] [set permeability 100
     set pcolor green]
-  ;setup matrix patches
+  ; setup matrix patches
   ask patches with [habitat != 1] [set habitat 2 set permeability matrix_permeability
     set pcolor white]
-  ;setup road patches
+  ; setup road patches
   ask patches with [pycor = 42] [
     set habitat 0
     set pcolor black]
@@ -54,119 +53,11 @@ to setup
   setup_turtles
   reset-ticks
 
-  if save_data? [set_filename] ;if save_data is on, data will be saved in the file addressed in set_filename
-end
-
-to create_scenario_1
-  ask (patch 21 22) [sprout 1 ]
-  ask turtles [set heading 90]
-  ask turtles [ repeat 40  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
-
-  ask turtles [set heading 0]
-  ask turtles [ repeat 19  [fd 1 ask patch-here [set habitat 1]]]
-  ask turtles [fd 1]
-  ask turtles [ repeat 20  [fd 1 ask patch-here [set habitat 1]]]
-  ct
-end
-
-to create_scenario_2_vert
-  ask (patch 46 22) [sprout 1]
-  ask (patch 15 22) [sprout 1]
-
-  ask turtles [set heading 90]
-  ask turtles [ repeat 20  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
-  ask turtles [set heading 0]
-  ask turtles [ repeat 19  [fd 1 ask patch-here [set habitat 1]]]
-  ask turtles [fd 1]
-  ask turtles [ repeat 20  [fd 1 ask patch-here [set habitat 1]]]
-
-  ct
-end
-
-to create_scenario_2_horiz
-  ask (patch 21 48) [sprout 1 set pcolor white]
-  ask (patch 21 17) [sprout 1 set pcolor white]
-
-  ask turtles [set heading 90]
-  ask turtles [ repeat 40  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
-  ask turtles [set heading 0]
-  ask turtles [ repeat 19  [fd 1 ask patch-here [set habitat 1]]]
-
-  ct
-end
-
-to create_scenario_16_close
-  ask (patch 5 11) [sprout 1]
-  ask (patch 26 11) [sprout 1]
-  ask (patch 47 11) [sprout 1]
-  ask (patch 68 11) [sprout 1]
-
-  ask turtles [set heading 90]
-  ask turtles [ repeat 10  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
-  ask turtles [set heading 0]
-  ask turtles [repeat 9  [fd 1 ask patch-here [set habitat 1]]]
-  ask turtles [fd 11]
-  ask turtles [ repeat 10  [fd 1 ask patch-here [set habitat 1]]]
-  ask turtles [fd 1]
-  ask turtles [ repeat 10  [fd 1 ask patch-here [set habitat 1]]]
-  ask turtles [fd 11]
-  ask turtles [ repeat 10  [fd 1 ask patch-here [set habitat 1]]]
-
-  ct
-end
-
-to create_scenario_16_far
-  ask (patch 5 6) [sprout 1]
-  ask (patch 26 6) [sprout 1]
-  ask (patch 47 6) [sprout 1]
-  ask (patch 68 6) [sprout 1]
-
-  ask turtles [set heading 90]
-  ask turtles [ repeat 10  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
-  ask turtles [set heading 0]
-  ask turtles [repeat 9  [fd 1 ask patch-here [set habitat 1]]]
-  ask turtles [fd 11]
-  ask turtles [ repeat 10  [fd 1 ask patch-here [set habitat 1]]]
-  ask turtles [fd 11]
-  ask turtles [ repeat 10  [fd 1 ask patch-here [set habitat 1]]]
-  ask turtles [fd 11]
-  ask turtles [ repeat 10  [fd 1 ask patch-here [set habitat 1]]]
-
-  ct
-end
-
-to create_scenario_vert_lines
-  ask (patch 7 0) [sprout 1]
-  ask (patch 28 0) [sprout 1]
-  ask (patch 49 0) [sprout 1]
-  ask (patch 70 0) [sprout 1]
-
-  ask turtles [set heading 90]
-  ask turtles [ repeat 5  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
-  ask turtles [set heading 0]
-  ask turtles [repeat 41  [fd 1 ask patch-here [set habitat 1]]]
-  ask turtles [fd 1]
-  ask turtles [ repeat 41  [fd 1 ask patch-here [set habitat 1]]]
-
-  ct
-end
-
-to create_scenario_horiz_lines
-  ask (patch 0 10) [sprout 1]
-  ask (patch 0 26) [sprout 1]
-  ask (patch 0 52) [sprout 1]
-  ask (patch 0 68) [sprout 1]
-
-  ask turtles [set heading 0]
-  ask turtles [ repeat 5  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
-  ask turtles [set heading 90 repeat 83  [fd 1 ask patch-here [set habitat 1]]]
-
-  ct
+  if save_data? [set_filename] ; if save_data is on, data will be saved in the file addressed in set_filename
 end
 
 to create_random
-  let ext max-pycor + 1
-
+  ; define number of patches that will be initially habitat based on proportion of habitat
   set seedlist list proportion_of_habitat (100 - proportion_of_habitat)
 
   let i 0
@@ -180,6 +71,7 @@ to create_random
   ]
 
   ; Credit: Uri Wilensky, Patch Cluster Example
+  ; set habitat value for patches that still nobody based on the neighbors value
   while [any? patches with [habitat = nobody]] [
     ask patches with [habitat = nobody][
       let c [habitat] of one-of neighbors4
@@ -189,6 +81,120 @@ to create_random
     ]
   ]
 
+end
+
+to create_scenario_A ; "1 patch"
+  ; some turtles are create to draw habitat patches - the patches where turtle move will be habitat
+  ask (patch 21 22) [sprout 1]
+  ask turtles [set heading 90]
+  ask turtles [repeat 40  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
+
+  ask turtles [set heading 0]
+  ask turtles [repeat 19  [fd 1 ask patch-here [set habitat 1]]]
+  ask turtles [fd 1]
+  ask turtles [repeat 20  [fd 1 ask patch-here [set habitat 1]]]
+  ct ; kill turtles used to draw patches
+end
+
+to create_scenario_B ; "2 vertical patches"
+  ; some turtles are create to draw habitat patches - the patches where turtle move will be habitat
+  ask (patch 46 22) [sprout 1]
+  ask (patch 15 22) [sprout 1]
+
+  ask turtles [set heading 90]
+  ask turtles [repeat 20  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
+  ask turtles [set heading 0]
+  ask turtles [repeat 19  [fd 1 ask patch-here [set habitat 1]]]
+  ask turtles [fd 1]
+  ask turtles [repeat 20  [fd 1 ask patch-here [set habitat 1]]]
+
+  ct ; kill turtles used to draw patches
+end
+
+to create_scenario_C ; "2 horizontal patches"
+  ; some turtles are create to draw habitat patches - the patches where turtle move will be habitat
+  ask (patch 21 48) [sprout 1 set pcolor white]
+  ask (patch 21 17) [sprout 1 set pcolor white]
+
+  ask turtles [set heading 90]
+  ask turtles [repeat 40  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
+  ask turtles [set heading 0]
+  ask turtles [repeat 19  [fd 1 ask patch-here [set habitat 1]]]
+
+  ct ; kill turtles used to draw patches
+end
+
+to create_scenario_D ; "16 pacthes close to road"
+  ; some turtles are create to draw habitat patches - the patches where turtle move will be habitat
+  ask (patch 5 11) [sprout 1]
+  ask (patch 26 11) [sprout 1]
+  ask (patch 47 11) [sprout 1]
+  ask (patch 68 11) [sprout 1]
+
+  ask turtles [set heading 90]
+  ask turtles [repeat 10  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
+  ask turtles [set heading 0]
+  ask turtles [repeat 9  [fd 1 ask patch-here [set habitat 1]]]
+  ask turtles [fd 11]
+  ask turtles [repeat 10  [fd 1 ask patch-here [set habitat 1]]]
+  ask turtles [fd 1]
+  ask turtles [repeat 10  [fd 1 ask patch-here [set habitat 1]]]
+  ask turtles [fd 11]
+  ask turtles [repeat 10  [fd 1 ask patch-here [set habitat 1]]]
+
+  ct ; kill turtles used to draw patches
+end
+
+to create_scenario_E ; "16 pacthes away from road"
+  ; some turtles are create to draw habitat patches - the patches where turtle move will be habitat
+  ask (patch 5 6) [sprout 1]
+  ask (patch 26 6) [sprout 1]
+  ask (patch 47 6) [sprout 1]
+  ask (patch 68 6) [sprout 1]
+
+  ask turtles [set heading 90]
+  ask turtles [repeat 10  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
+  ask turtles [set heading 0]
+  ask turtles [repeat 9  [fd 1 ask patch-here [set habitat 1]]]
+  ask turtles [fd 11]
+  ask turtles [repeat 10  [fd 1 ask patch-here [set habitat 1]]]
+  ask turtles [fd 11]
+  ask turtles [repeat 10  [fd 1 ask patch-here [set habitat 1]]]
+  ask turtles [fd 11]
+  ask turtles [repeat 10  [fd 1 ask patch-here [set habitat 1]]]
+
+  ct ; kill turtles used to draw patches
+end
+
+to create_scenario_F ; "vertical lines"
+  ; some turtles are create to draw habitat patches - the patches where turtle move will be habitat
+  ask (patch 7 0) [sprout 1]
+  ask (patch 28 0) [sprout 1]
+  ask (patch 49 0) [sprout 1]
+  ask (patch 70 0) [sprout 1]
+
+  ask turtles [set heading 90]
+  ask turtles [repeat 5  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
+  ask turtles [set heading 0]
+  ask turtles [repeat 41  [fd 1 ask patch-here [set habitat 1]]]
+  ask turtles [fd 1]
+  ask turtles [repeat 41  [fd 1 ask patch-here [set habitat 1]]]
+
+  ct ; kill turtles used to draw patches
+end
+
+to create_scenario_G ; "horizontal lines"
+  ; some turtles are create to draw habitat patches - the patches where turtle move will be habitat
+  ask (patch 0 10) [sprout 1]
+  ask (patch 0 26) [sprout 1]
+  ask (patch 0 52) [sprout 1]
+  ask (patch 0 68) [sprout 1]
+
+  ask turtles [set heading 0]
+  ask turtles [repeat 5  [fd 1 ask patch-here [sprout 1 set habitat 1]]]
+  ask turtles [set heading 90 repeat 83  [fd 1 ask patch-here [set habitat 1]]]
+
+  ct ; kill turtles used to draw patches
 end
 
 to setup_turtles
@@ -251,7 +257,7 @@ to check_move
   ask candidate_patches [let d distance myself ; calculate the distance of the turtle to each candidate_patches
     set current_permeability permeability * ((1 / perceptual_range) + ((perceptual_range - d)/ (perceptual_range)))
   ]
-  set chosen_patch rnd:weighted-one-of candidate_patches [current_permeability] ; agents random choose patches weighted by current_permeability
+  set chosen_patch rnd:weighted-one-of candidate_patches [current_permeability] ; agents randomly choose patches weighted by current_permeability
 end
 ;;
 
@@ -314,7 +320,7 @@ to set_filename
    ]
 end
 
-to save_data ;; information to save that in the addressed file
+to save_data ;; information to save in the addressed file
   file-open filename
   file-print (word
     number_of_individuals ","
@@ -331,15 +337,15 @@ to save_data ;; information to save that in the addressed file
 end
 
 to delete_file
-  if file-exists? filename  [
+  if file-exists? filename [
     file-close-all
      file-delete filename ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-245
+355
 30
-589
+699
 375
 -1
 -1
@@ -366,7 +372,7 @@ ticks
 BUTTON
 5
 30
-130
+115
 63
 NIL
 setup
@@ -382,9 +388,9 @@ NIL
 
 INPUTBOX
 5
-115
+70
+170
 130
-175
 number_of_individuals
 100.0
 1
@@ -392,10 +398,10 @@ number_of_individuals
 Number
 
 BUTTON
-5
-65
-130
-98
+120
+30
+230
+63
 go
 go
 T
@@ -409,10 +415,10 @@ NIL
 1
 
 BUTTON
-355
-435
-477
-468
+115
+385
+237
+418
 NIL
 paint_patch_use
 NIL
@@ -426,10 +432,10 @@ NIL
 1
 
 INPUTBOX
-5
 175
+70
+345
 130
-235
 steps
 500.0
 1
@@ -438,9 +444,9 @@ Number
 
 SLIDER
 5
-330
-150
-363
+225
+345
+258
 matrix_permeability
 matrix_permeability
 10
@@ -450,44 +456,27 @@ matrix_permeability
 1
 NIL
 HORIZONTAL
-
-BUTTON
-135
-30
-242
-63
-clear_drawing
-clear-drawing
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
 
 SLIDER
 5
-290
-192
-323
+185
+345
+218
 proportion_of_habitat
 proportion_of_habitat
 10
 90
-10.0
+25.0
 5
 1
 NIL
 HORIZONTAL
 
 BUTTON
-245
-435
-352
-468
+5
+385
+112
+418
 NIL
 paint_habitats
 NIL
@@ -501,10 +490,10 @@ NIL
 1
 
 BUTTON
-5
-365
-150
-398
+95
+265
+240
+298
 NIL
 update_permeability
 NIL
@@ -518,10 +507,10 @@ NIL
 1
 
 MONITOR
-380
-380
-510
-425
+505
+385
+635
+430
 NIL
 assess_top_sections
 4
@@ -529,10 +518,10 @@ assess_top_sections
 11
 
 BUTTON
-135
-65
-240
-98
+235
+30
+345
+63
 NIL
 new_run
 NIL
@@ -546,10 +535,10 @@ NIL
 1
 
 BUTTON
-480
-435
-627
-468
+240
+385
+387
+418
 NIL
 paint_road_crossings
 NIL
@@ -564,9 +553,9 @@ NIL
 
 SLIDER
 5
-405
-145
-438
+305
+345
+338
 perceptual_range
 perceptual_range
 5
@@ -579,40 +568,19 @@ HORIZONTAL
 
 CHOOSER
 5
-240
-217
-285
+135
+345
+180
 scenario
 scenario
-1 2 3 4 5 6 7 8
-7
-
-MONITOR
-655
-270
-712
-315
-matrix
-count patches with [habitat = 2]
-1
-1
-11
-
-TEXTBOX
-730
-290
-780
-316
-5456
-11
-104.0
-1
+"Habitat amount" "Configuration - A" "Configuration - B" "Configuration - C" "Configuration - D" "Configuration - E" "Configuration - F" "Configuration - G"
+0
 
 INPUTBOX
-285
-480
-450
-540
+395
+435
+560
+495
 outputfile
 sobol2007
 1
@@ -621,9 +589,9 @@ String
 
 SWITCH
 5
-545
-122
-578
+475
+130
+508
 save_data?
 save_data?
 1
@@ -631,10 +599,10 @@ save_data?
 -1000
 
 MONITOR
-330
-545
-1130
-590
+5
+515
+390
+560
 NIL
 filename
 17
@@ -642,10 +610,10 @@ filename
 11
 
 MONITOR
-245
-380
-350
-425
+395
+385
+500
+430
 NIL
 total_crossings
 17
@@ -654,19 +622,19 @@ total_crossings
 
 CHOOSER
 5
-480
-275
-525
+425
+385
+470
 root
 root
-"/Users/bibianaterra/Library/CloudStorage/OneDrive-Personal/Doutorado/Predicao_ferrovias/ibm-code/results" "C:\\Users\\BIO\\Desktop\\bibs" "C:\\Users\\bibia\\OneDrive\\Doutorado\\Predicao_ferrovias\\ibm-code"
-2
+"/Users/bibianaterra/Library/CloudStorage/OneDrive-Personal/Doutorado/Predicao_ferrovias/ibm-code/results" "C:\\Users\\BIO\\Desktop\\bibs"
+1
 
 BUTTON
-125
-545
-232
-578
+135
+475
+265
+508
 NIL
 set_filename
 NIL
@@ -680,10 +648,10 @@ NIL
 1
 
 BUTTON
-235
-545
-327
-578
+272
+475
+387
+508
 NIL
 delete_file
 NIL
@@ -696,32 +664,11 @@ NIL
 NIL
 1
 
-TEXTBOX
-730
-330
-760
-348
-1600
-11
-92.0
-1
-
-MONITOR
-655
-320
-712
-365
-habitat
-count patches with [habitat = 1]
-1
-1
-11
-
 SLIDER
 5
-440
-177
-473
+345
+345
+378
 vision_angle
 vision_angle
 90
