@@ -29,15 +29,15 @@ to setup
     set visits 0
   ]
 
-  ; types of scenarios that will be generated
-  if scenario = "Habitat amount" [create_random] ; "habitat amount"
-  if scenario = "Configuration - A" [create_scenario_A] ; "1 patch"
-  if scenario = "Configuration - B" [create_scenario_B] ; "2 vertical patches"
-  if scenario = "Configuration - C" [create_scenario_C] ; "2 horizontal patches"
-  if scenario = "Configuration - D" [create_scenario_D] ; "16 pacthes close to road"
-  if scenario = "Configuration - E" [create_scenario_E] ; "16 pacthes away from road"
-  if scenario = "Configuration - F" [create_scenario_F] ; "vertical lines"
-  if scenario = "Configuration - G" [create_scenario_G] ; "horizontal lines"
+  ; types of landscapes that will be generated
+  if submodel = "Habitat amount" [create_random] ; "habitat amount"
+  if submodel = "Configuration - A" [create_landscape_A] ; "1 patch"
+  if submodel = "Configuration - B" [create_landscape_B] ; "2 vertical patches"
+  if submodel = "Configuration - C" [create_landscape_C] ; "2 horizontal patches"
+  if submodel = "Configuration - D" [create_landscape_D] ; "16 pacthes close to road"
+  if submodel = "Configuration - E" [create_landscape_E] ; "16 pacthes away from road"
+  if submodel = "Configuration - F" [create_landscape_F] ; "vertical lines"
+  if submodel = "Configuration - G" [create_landscape_G] ; "horizontal lines"
 
   ; setup habitat patches
   ask patches with [habitat = 1] [set permeability 100
@@ -83,7 +83,7 @@ to create_random
 
 end
 
-to create_scenario_A ; "1 patch"
+to create_landscape_A ; "1 patch"
   ; some turtles are create to draw habitat patches - the patches where turtle move will be habitat
   ask (patch 21 22) [sprout 1]
   ask turtles [set heading 90]
@@ -96,7 +96,7 @@ to create_scenario_A ; "1 patch"
   ct ; kill turtles used to draw patches
 end
 
-to create_scenario_B ; "2 vertical patches"
+to create_landscape_B ; "2 vertical patches"
   ; some turtles are create to draw habitat patches - the patches where turtle move will be habitat
   ask (patch 46 22) [sprout 1]
   ask (patch 15 22) [sprout 1]
@@ -111,7 +111,7 @@ to create_scenario_B ; "2 vertical patches"
   ct ; kill turtles used to draw patches
 end
 
-to create_scenario_C ; "2 horizontal patches"
+to create_landscape_C ; "2 horizontal patches"
   ; some turtles are create to draw habitat patches - the patches where turtle move will be habitat
   ask (patch 21 48) [sprout 1 set pcolor white]
   ask (patch 21 17) [sprout 1 set pcolor white]
@@ -124,7 +124,7 @@ to create_scenario_C ; "2 horizontal patches"
   ct ; kill turtles used to draw patches
 end
 
-to create_scenario_D ; "16 pacthes close to road"
+to create_landscape_D ; "16 pacthes close to road"
   ; some turtles are create to draw habitat patches - the patches where turtle move will be habitat
   ask (patch 5 11) [sprout 1]
   ask (patch 26 11) [sprout 1]
@@ -145,7 +145,7 @@ to create_scenario_D ; "16 pacthes close to road"
   ct ; kill turtles used to draw patches
 end
 
-to create_scenario_E ; "16 pacthes away from road"
+to create_landscape_E ; "16 pacthes away from road"
   ; some turtles are create to draw habitat patches - the patches where turtle move will be habitat
   ask (patch 5 6) [sprout 1]
   ask (patch 26 6) [sprout 1]
@@ -166,7 +166,7 @@ to create_scenario_E ; "16 pacthes away from road"
   ct ; kill turtles used to draw patches
 end
 
-to create_scenario_F ; "vertical lines"
+to create_landscape_F ; "vertical lines"
   ; some turtles are create to draw habitat patches - the patches where turtle move will be habitat
   ask (patch 7 0) [sprout 1]
   ask (patch 28 0) [sprout 1]
@@ -183,7 +183,7 @@ to create_scenario_F ; "vertical lines"
   ct ; kill turtles used to draw patches
 end
 
-to create_scenario_G ; "horizontal lines"
+to create_landscape_G ; "horizontal lines"
   ; some turtles are create to draw habitat patches - the patches where turtle move will be habitat
   ask (patch 0 10) [sprout 1]
   ask (patch 0 26) [sprout 1]
@@ -262,7 +262,7 @@ end
 ;;
 
 ;; outputs
-to-report assess_top_sections ; calculate proportion of crossings in the 25% of most crossed sections of the road
+to-report prop_top_sections ; calculate proportion of crossings in the 25% of most crossed sections of the road
   let sort_crossings sort-by > [visits] of patches with [habitat = 0] ; sort patches by number of visits they receive
 
   ifelse total_crossings > 0 [
@@ -302,20 +302,20 @@ end
 ;;; save data
 to set_filename
   ; create and/or open the file to store data from the model - in a csv file
-  ifelse file-exists? (word root "\\" outputfile ".csv")
-   [ set filename (word root "\\" outputfile ".csv") ]
-   [ set filename (word root "\\" outputfile ".csv")
+  ifelse file-exists? (word directory "\\" output_file ".csv")
+   [ set filename (word directory "\\" output_file ".csv") ]
+   [ set filename (word directory "\\" output_file ".csv")
      file-open filename
      file-print (word
        "N_individuals" ","
        "steps" ","
-       "scenario" ","
+       "submodel" ","
        "proportion_of_habitat" ","
        "matrix_permeability" ","
        "perceptual_range" ","
        "vision_angle" ","
        "total_crossings" ","
-       "assess_top_sections")
+       "prop_top_sections")
      file-close-all
    ]
 end
@@ -325,13 +325,13 @@ to save_data ;; information to save in the addressed file
   file-print (word
     number_of_individuals ","
     steps ","
-    scenario ","
+    submodel ","
     proportion_of_habitat ","
     matrix_permeability ","
     perceptual_range ","
     vision_angle ","
     total_crossings ","
-    assess_top_sections)
+    prop_top_sections)
 
   file-close
 end
@@ -512,7 +512,7 @@ MONITOR
 635
 430
 NIL
-assess_top_sections
+prop_top_sections
 4
 1
 11
@@ -571,8 +571,8 @@ CHOOSER
 135
 345
 180
-scenario
-scenario
+submodel
+submodel
 "Habitat amount" "Configuration - A" "Configuration - B" "Configuration - C" "Configuration - D" "Configuration - E" "Configuration - F" "Configuration - G"
 0
 
@@ -581,8 +581,8 @@ INPUTBOX
 435
 560
 495
-outputfile
-sobol2007
+output_file
+simulations
 1
 0
 String
@@ -625,10 +625,10 @@ CHOOSER
 425
 385
 470
-root
-root
-"/Users/bibianaterra/Library/CloudStorage/OneDrive-Personal/Doutorado/Predicao_ferrovias/ibm-code/results" "C:\\Users\\BIO\\Desktop\\bibs"
-1
+directory
+directory
+"DEFINE YOUR DIRECTORY HERE"
+0
 
 BUTTON
 135
