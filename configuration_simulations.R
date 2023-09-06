@@ -45,7 +45,7 @@ nl_crossings@experiment <- experiment(expname = "sobol2007_cenarios_fixos",
 eval_variables_constants(nl_crossings)
 
 nl_crossings@simdesign <- simdesign_sobol2007(nl = nl_crossings,
-                                          samples = 3000,
+                                          samples = 10000,
                                           sobolnboot = 300,
                                           sobolconf = 0.95,
                                           nseeds = 1,
@@ -55,13 +55,13 @@ nl_crossings@simdesign
 print(nl_crossings)
 
 ## Run parallel
-plan(multisession)
+plan(multisession, workers = 6)
 progressr::handlers("progress")
-results_crossings <- progressr::with_progress(nlrx::run_nl_all(nl = nl_crossings))
+results_crossings <- progressr::with_progress(nlrx::run_nl_all(nl = nl_crossings, split = 6))
 
 # Attach results to nl
 setsim(nl_crossings, "simoutput") <- results_crossings
 
 # Store nl object
-saveRDS(nl_crossings, "configuration_simulations.rds")
+saveRDS(nl_crossings, here("results", "configuration_simulations_dezmil.rds"))
 # 

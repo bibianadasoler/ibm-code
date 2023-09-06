@@ -43,7 +43,7 @@ nl_crossings@experiment <- experiment(expname = "sobol2007",
 eval_variables_constants(nl_crossings)
 
 nl_crossings@simdesign <- simdesign_sobol2007(nl = nl_crossings,
-                                   samples = 6000,
+                                   samples = 10000,
                                    sobolnboot = 300,
                                    sobolconf = 0.95,
                                    nseeds = 1,
@@ -55,9 +55,9 @@ hist(nl_crossings@simdesign@siminput$matrix_permeability)
 print(nl_crossings)
 
 ## Run parallel
-plan(multisession)
+plan(multisession, workers = 6)
 progressr::handlers("progress")
-results_crossings <- progressr::with_progress(nlrx::run_nl_all(nl = nl_crossings))
+results_crossings <- progressr::with_progress(nlrx::run_nl_all(nl = nl_crossings, split = 6))
 
 # Attach results to nl
 setsim(nl_crossings, "simoutput") <- results_crossings

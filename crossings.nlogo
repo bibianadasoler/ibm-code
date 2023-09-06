@@ -626,7 +626,7 @@ SWITCH
 578
 save_data?
 save_data?
-1
+0
 1
 -1000
 
@@ -659,8 +659,8 @@ CHOOSER
 525
 root
 root
-"/Users/bibianaterra/Library/CloudStorage/OneDrive-Personal/Doutorado/Predicao_ferrovias/ibm-code/results" "C:\\Users\\BIO\\Desktop\\bibs" "C:\\Users\\bibia\\OneDrive\\Doutorado\\Predicao_ferrovias\\ibm-code"
-2
+"/Users/bibianaterra/Library/CloudStorage/OneDrive-Personal/Doutorado/Predicao_ferrovias/ibm-code/results" "C:\\Users\\bibia\\Desktop" "C:\\Users\\bibia\\OneDrive\\Doutorado\\Predicao_ferrovias\\ibm-code"
+1
 
 BUTTON
 125

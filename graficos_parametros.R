@@ -44,11 +44,13 @@ mean_assess_vision_habitat <- habitat_amount_simulations %>%
   geom_point(data = habitat_amount_simulations, aes(x = proportion_of_habitat, y = assess_top_sections), size = 0.05) +
   geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
   geom_line(color = "grey5", linewidth = 0.5) +
-  ylim(0,1) + scale_x_continuous(breaks = c(10,30,50,70,90)) +
+  ylim(0,1) + scale_x_continuous(breaks = c(10,30,50,70,90), expand = c(0,0.5)) +
   geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
-  labs(y = "Proportion of crossing top sections", x = "Proportion of habitat") +  
+  labs(y = "Proportion of crossing top sections", x = "Proportion of habitat", tag = "A") +  
    theme(panel.background = element_rect(fill = "white"), 
-         panel.border = element_rect(fill = NA, colour = "grey20"))
+         panel.border = element_rect(fill = NA, colour = "grey20"),
+         plot.tag = element_text(size = 10),
+         plot.tag.position = c(0.02,1))
 )
 
 ##### Matrix permeability ----
@@ -59,11 +61,13 @@ mean_assess_vision_habitat <- habitat_amount_simulations %>%
    geom_point(data = habitat_amount_simulations, aes(x = matrix_permeability, y = assess_top_sections), size = 0.05) +
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "grey5", linewidth = 0.5) +
-   ylim(0,1) + scale_x_continuous(breaks = c(10,30,50,70,90)) +
+   ylim(0,1) + scale_x_continuous(breaks = c(10,30,50,70,90), expand = c(0,0.5)) +
    geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
-   labs(y = "Proportion of crossing top sections", x = "Matrix permeability") +  
+   labs(y = "Proportion of crossing top sections", x = "Matrix permeability", tag = "B") +  
    theme(panel.background = element_rect(fill = "white"), 
-         panel.border = element_rect(fill = NA, colour = "grey20"))
+         panel.border = element_rect(fill = NA, colour = "grey20"),
+         plot.tag = element_text(size = 10),
+         plot.tag.position = c(0.02,1))
 )
 
 ##### Perceptual range ----
@@ -74,11 +78,13 @@ mean_assess_vision_habitat <- habitat_amount_simulations %>%
    geom_point(data = habitat_amount_simulations, aes(x = perceptual_range, y = assess_top_sections), size = 0.05) +
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "grey5", linewidth = 0.5) +
-   ylim(0,1) + scale_x_continuous(breaks = c(5, 15, 25, 35, 42)) +
+   ylim(0,1) + scale_x_continuous(breaks = c(5, 15, 25, 35, 42), expand = c(0,0.5)) +
    geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
-   labs(y = "Proportion of crossing top sections", x = "Perceptual range") +
+   labs(y = "Proportion of crossing top sections", x = "Perceptual range", tag = "C") +
    theme(panel.background = element_rect(fill = "white"), 
-         panel.border = element_rect(fill = NA, colour = "grey20"))
+         panel.border = element_rect(fill = NA, colour = "grey20"),
+         plot.tag = element_text(size = 10),
+         plot.tag.position = c(0.02,1))
 )
 
 ##### Vision angle ----
@@ -89,11 +95,13 @@ mean_assess_vision_habitat <- habitat_amount_simulations %>%
    geom_point(data = habitat_amount_simulations, aes(x = vision_angle, y = assess_top_sections), size = 0.05) +
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "grey5", linewidth = 0.5) +
-   ylim(0,1) + scale_x_continuous(breaks = c(90, 120, 150, 180)) +
+   ylim(0,1) + scale_x_continuous(breaks = c(90, 120, 150, 180), expand = c(0,0.5)) +
    geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
-   labs(y = "Proportion of crossing top sections", x = "Vision angle") +
+   labs(y = "Proportion of crossing top sections", x = "Vision angle", tag = "D") +
    theme(panel.background = element_rect(fill = "white"), 
-         panel.border = element_rect(fill = NA, colour = "grey20"))
+         panel.border = element_rect(fill = NA, colour = "grey20"),
+         plot.tag = element_text(size = 10),
+         plot.tag.position = c(0.02,1))
 )
 #### Total crossings ----
 mean_total_prop_habitat <- habitat_amount_simulations %>%
@@ -126,12 +134,14 @@ mean_total_vision_habitat <- habitat_amount_simulations %>%
    geom_point(data = habitat_amount_simulations, aes(x = proportion_of_habitat, y = total_crossings), size = 0.05) +
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "blue", linewidth = 0.5) +
-   labs(y = "Total crossings road", x = "Proportion of habitat") +
+   labs(y = "Total crossings road", x = "Proportion of habitat", tag = "E") +
    scale_y_continuous(breaks =  c(0, 250, 500, 750, 1000, 1250, 1500, 1750, 2250), limits = c(0,2500)) +
-   scale_x_continuous(breaks = c(10,25,50,75,90)) +
+   scale_x_continuous(breaks = c(10,25,50,75,90), expand = c(0,0.5)) +
    theme(panel.background = element_rect(fill = "white"), 
          panel.border = element_rect(fill = NA, colour = "grey20"), 
-         panel.grid.major.y = element_line(colour = "grey92"))
+         panel.grid.major.y = element_line(colour = "grey92"),
+         plot.tag = element_text(size = 10),
+         plot.tag.position = c(0.02,1))
 )
 
 ##### Matrix permeability ----
@@ -139,12 +149,14 @@ mean_total_vision_habitat <- habitat_amount_simulations %>%
    geom_point(data = habitat_amount_simulations, aes(x = matrix_permeability, y = total_crossings), size = 0.05) +
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "blue", linewidth = 0.5) +
-   labs(y = "Total crossings road", x = "Matrix permeability") +
+   labs(y = "Total crossings road", x = "Matrix permeability", tag = "F") +
    scale_y_continuous(breaks =  c(0, 250, 500, 750, 1000, 1250, 1500, 1750, 2250), limits = c(0,2500)) +
-   scale_x_continuous(breaks = c(10,30,50,70,90)) +
+   scale_x_continuous(breaks = c(10,30,50,70,90), expand = c(0,0.5)) +
    theme(panel.background = element_rect(fill = "white"), 
          panel.border = element_rect(fill = NA, colour = "grey20"), 
-         panel.grid.major.y = element_line(colour = "grey92"))
+         panel.grid.major.y = element_line(colour = "grey92"),
+         plot.tag = element_text(size = 10),
+         plot.tag.position = c(0.02,1))
 )
 
 ##### Perceptual range ----
@@ -152,24 +164,28 @@ mean_total_vision_habitat <- habitat_amount_simulations %>%
    geom_point(data = habitat_amount_simulations, aes(x = perceptual_range, y = total_crossings), size = 0.05) +
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "blue", linewidth = 0.5) +
-   labs(y = "Total crossings road", x = "Perceptual range") +
+   labs(y = "Total crossings road", x = "Perceptual range", tag = "G") +
    scale_y_continuous(breaks =  c(0, 250, 500, 750, 1000, 1250, 1500, 1750, 2250), limits = c(0,2500)) +
-   scale_x_continuous(breaks = c(5, 15, 25, 35, 42)) +
+   scale_x_continuous(breaks = c(5, 15, 25, 35, 42), expand = c(0,0.5)) +
    theme(panel.background = element_rect(fill = "white"), 
          panel.border = element_rect(fill = NA, colour = "grey20"), 
-         panel.grid.major.y = element_line(colour = "grey92"))
+         panel.grid.major.y = element_line(colour = "grey92"),
+         plot.tag = element_text(size = 10),
+         plot.tag.position = c(0.02,1))
 )
 ##### Vision angle ----
 (crossings_vision_habitat_amount <- ggplot(mean_total_vision_habitat, aes(x = vision_angle, y = mean)) +
    geom_point(data = habitat_amount_simulations, aes(x = vision_angle, y = total_crossings), size = 0.05) +
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "blue", linewidth = 0.5) +
-   labs(y = "Total crossings road", x = "Vision angle") +
+   labs(y = "Total crossings road", x = "Vision angle", tag = "H") +
    scale_y_continuous(breaks =  c(0, 250, 500, 750, 1000, 1250, 1500, 1750, 2250), limits = c(0,2500)) +
-   scale_x_continuous(breaks = c(90, 120, 150, 180)) +
+   scale_x_continuous(breaks = c(90, 120, 150, 180), expand = c(0,0.5)) +
    theme(panel.background = element_rect(fill = "white"), 
          panel.border = element_rect(fill = NA, colour = "grey20"), 
-         panel.grid.major.y = element_line(colour = "grey92"))
+         panel.grid.major.y = element_line(colour = "grey92"),
+         plot.tag = element_text(size = 10),
+         plot.tag.position = c(0.02,1))
 )
 
 ##### todos juntos ----
@@ -205,13 +221,15 @@ mean_assess_vision_config <- configuration_simulations %>%
    annotate("rect",  xmin = -Inf, xmax = Inf, ymin = 0.75, ymax = 1, alpha = 0.15, fill = "red") +
    stat_halfeye(adjust = 0.5, width = 0.75, justification = -0.25, .width = 0, point_colour = NA, fill = "grey35") +
    geom_boxplot(width = 0.15, outlier.color = NA, alpha = 0.5) +
-   labs(y = "Proportion of crossing top sections", x = "Scenario") +
+   labs(y = "Crossings aggregation", x = "Scenarios", tag = "A") +
    scale_x_discrete(labels=c("1" = "A", "2" = "B", "3" = "C", "4" = "D",
-                             "5" = "E", "6" = "F",  "7" = "G")) +
+                             "5" = "E", "6" = "F",  "7" = "G"), expand = c(0,0.2)) +
    ylim(0,1)  + 
    geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
    theme(panel.background = element_rect(fill = "white"), 
-         panel.border = element_rect(fill = NA, colour = "grey20"))
+         panel.border = element_rect(fill = NA, colour = "grey20"),
+         plot.tag = element_text(size = 10),
+         plot.tag.position = c(0.02,1))
 )
 ##### Matrix permeability ----
 (assess_perm_config <- ggplot(mean_assess_perm_config, aes(x = matrix_permeability, y = mean)) +
@@ -221,11 +239,13 @@ mean_assess_vision_config <- configuration_simulations %>%
    geom_point(data = configuration_simulations, aes(x = matrix_permeability, y = assess_top_sections), size = 0.05) +
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "grey5", linewidth = 0.5) +
-   labs(y = "Proportion of crossing top sections", x = "Matrix permeability") +
-   ylim(0,1) + scale_x_continuous(breaks = c(10,30,50,70,90)) +
+   labs(y = "Crossings aggregation", x = "Matrix permeability", tag = "B") +
+   ylim(0,1) + scale_x_continuous(breaks = c(10,30,50,70,90), expand = c(0,0.5)) +
    geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
    theme(panel.background = element_rect(fill = "white"), 
-         panel.border = element_rect(fill = NA, colour = "grey20"))
+         panel.border = element_rect(fill = NA, colour = "grey20"),
+         plot.tag = element_text(size = 10),
+         plot.tag.position = c(0.02,1))
 )
 ##### Perceptual range ----
 (assess_percep_config <- ggplot(mean_assess_percep_config, aes(x = perceptual_range, y = mean)) +
@@ -235,11 +255,13 @@ mean_assess_vision_config <- configuration_simulations %>%
    geom_point(data = configuration_simulations, aes(x = perceptual_range, y = assess_top_sections), size = 0.05) +
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "grey5", linewidth = 0.5) +
-   labs(y = "Proportion of crossing top sections", x = "Perceptual range") +
-   ylim(0,1) + scale_x_continuous(breaks = c(5, 15, 25, 35, 42)) +
+   labs(y = "Crossings aggregation", x = "Perceptual range", tag = "C") +
+   ylim(0,1) + scale_x_continuous(breaks = c(5, 15, 25, 35, 42), expand = c(0,0.5)) +
    geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
    theme(panel.background = element_rect(fill = "white"), 
-         panel.border = element_rect(fill = NA, colour = "grey20"))
+         panel.border = element_rect(fill = NA, colour = "grey20"),
+         plot.tag = element_text(size = 10),
+         plot.tag.position = c(0.02,1))
 )
 
 ##### Vision angle ----
@@ -250,11 +272,13 @@ mean_assess_vision_config <- configuration_simulations %>%
    geom_point(data = configuration_simulations, aes(x = vision_angle, y = assess_top_sections), size = 0.05) +
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "grey5", linewidth = 0.5) +
-   labs(y = "Proportion of crossing top sections", x = "Vision angle") +
-   ylim(0,1) + scale_x_continuous(breaks = c(90, 120, 150, 180)) +
+   labs(y = "Crossings aggregation", x = "Vision angle", tag = "D") +
+   ylim(0,1) + scale_x_continuous(breaks = c(90, 120, 150, 180), expand = c(0,0.5)) +
    geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
    theme(panel.background = element_rect(fill = "white"), 
-         panel.border = element_rect(fill = NA, colour = "grey20"))
+         panel.border = element_rect(fill = NA, colour = "grey20"),
+         plot.tag = element_text(size = 10),
+         plot.tag.position = c(0.02,1))
 )
 
 #### Total crossings ----
@@ -280,13 +304,15 @@ mean_total_vision_config <- configuration_simulations %>%
 (crossings_scenarios_config <- ggplot(configuration_simulations, aes(x = factor(scenario), y = total_crossings)) +
    stat_halfeye(adjust = 0.5, width = 0.75, justification = -0.25, .width = 0, point_colour = NA, fill = "grey35") +
    geom_boxplot(width = 0.15, outlier.color = NA, alpha = 0.5) +
-   labs(y = "Total crossings road", x = "Scenario") +
+   labs(y = "Total crossings", x = "Scenario", tag = "E") +
    scale_x_discrete(labels=c("1" = "A", "2" = "B", "3" = "C", "4" = "D",
-                             "5" = "E", "6" = "F",  "7" = "G")) +
+                             "5" = "E", "6" = "F",  "7" = "G"), expand = c(0,0.2)) +
    scale_y_continuous(breaks =  c(0, 600, 1200, 1800, 2400, 3000, 3600), limits = c(0,3600)) +
    theme(panel.background = element_rect(fill = "white"), 
          panel.border = element_rect(fill = NA, colour = "grey20"), 
-         panel.grid.major.y = element_line(colour = "grey92"))
+         panel.grid.major.y = element_line(colour = "grey92"),
+         plot.tag = element_text(size = 10),
+         plot.tag.position = c(0.02,1))
  ) 
 
 ##### Matrix permeability ----
@@ -294,12 +320,14 @@ mean_total_vision_config <- configuration_simulations %>%
    geom_point(data = configuration_simulations, aes(x = matrix_permeability, y = total_crossings), size = 0.05) +
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "blue", linewidth = 0.5) +
-   labs(y = "Total crossings road", x = "Matrix permeability") +
+   labs(y = "Total crossings", x = "Matrix permeability", tag = "F") +
    scale_y_continuous(breaks =  c(0, 600, 1200, 1800, 2400, 3000, 3600), limits = c(0,3600)) +
-   scale_x_continuous(breaks = c(10, 30, 50, 70, 90)) +
+   scale_x_continuous(breaks = c(10, 30, 50, 70, 90), expand = c(0,0.5)) +
    theme(panel.background = element_rect(fill = "white"), 
          panel.border = element_rect(fill = NA, colour = "grey20"), 
-         panel.grid.major.y = element_line(colour = "grey92"))
+         panel.grid.major.y = element_line(colour = "grey92"),
+         plot.tag = element_text(size = 10),
+         plot.tag.position = c(0.02,1))
 )
 
 ##### Perceptual range ----
@@ -307,12 +335,14 @@ mean_total_vision_config <- configuration_simulations %>%
    geom_point(data = configuration_simulations, aes(x = perceptual_range, y = total_crossings), size = 0.05) +
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "blue", linewidth = 0.5) +
-   labs(y = "Total crossings road", x = "Perceptual range") +
+   labs(y = "Total crossings", x = "Perceptual range", tag = "G") +
    scale_y_continuous(breaks =  c(0, 600, 1200, 1800, 2400, 3000, 3600), limits = c(0,3600)) +
-   scale_x_continuous(breaks = c(5, 15, 25, 35, 42)) +
+   scale_x_continuous(breaks = c(5, 15, 25, 35, 42), expand = c(0,0.5)) +
    theme(panel.background = element_rect(fill = "white"), 
          panel.border = element_rect(fill = NA, colour = "grey20"), 
-         panel.grid.major.y = element_line(colour = "grey92"))
+         panel.grid.major.y = element_line(colour = "grey92"),
+         plot.tag = element_text(size = 10),
+         plot.tag.position = c(0.02,1))
 )
 
 ##### Vision angle ----
@@ -320,20 +350,24 @@ mean_total_vision_config <- configuration_simulations %>%
    geom_point(data = configuration_simulations, aes(x = vision_angle, y = total_crossings), size = 0.05) +
    geom_ribbon(aes(ymin = lcl, ymax = ucl), alpha = 0.8, fill = "grey100", linewidth = 0) +
    geom_line(color = "blue", linewidth = 0.5) +
-   labs(y = "Total crossings road", x = "Vision angle") +
+   labs(y = "Total crossings", x = "Vision angle", tag = "H") +
    scale_y_continuous(breaks =  c(0, 600, 1200, 1800, 2400, 3000, 3600), limits = c(0,3600)) +
-   scale_x_continuous(breaks = c(90, 120, 150, 180)) +
+   scale_x_continuous(breaks = c(90, 120, 150, 180), expand = c(0,0.5)) +
    theme(panel.background = element_rect(fill = "white"), 
          panel.border = element_rect(fill = NA, colour = "grey20"), 
-         panel.grid.major.y = element_line(colour = "grey92"))
+         panel.grid.major.y = element_line(colour = "grey92"),
+         plot.tag = element_text(size = 10),
+         plot.tag.position = c(0.02,1))
 )
 
 ##### todos juntos ----
 grid.arrange(assess_scenarios_config, assess_perm_config, assess_percep_config, assess_vision_config,
              crossings_scenarios_config, crossings_perm_config, crossings_percep_config, crossings_vision_config,
              ncol = 4)
+#1234 x 851
 
 ##### HABITAT AND CONFIGURATION----
 grid.arrange(assess_scenarios_config, assess_perm_config, assess_percep_config, assess_vision_config,
              assess_prop_habitat_amount, assess_perm_habitat_amount, assess_percep_habitat_amount, assess_vision_habitat_amount,
              ncol = 4)
+
