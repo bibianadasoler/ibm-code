@@ -2,12 +2,12 @@ library(sensitivity)
 library(dplyr)
 library(here)
 library(ggplot2)
-library(gridExtra)
+library(patchwork)
 
 # obter inputs do objeto netlogo para adicionar na analise de sensibilidade
 # carregar o objeto netlogo - pasta results, arquivo configuration_simulations.rds
 # inputs
-configuration_simulations <- readRDS(file = here("results", "configuration_simulations_6000.rds"))
+configuration_simulations <- readRDS(file = here("results", "configuration_simulations_dezmil.rds"))
 random_sample_1 <- configuration_simulations@simdesign@simobject[[1]][["X1"]]
 random_sample_2 <- configuration_simulations@simdesign@simobject[[1]][["X2"]]
 experiment_design <- configuration_simulations@simdesign@siminput
@@ -38,7 +38,7 @@ assess_graph <- rbind(assess_first_graph, assess_total_graph)
                     position = position_dodge(width = 0.3), size = 0.3) +
     scale_colour_manual(values = c("first-order" = "black", "total" = "grey50"),
                         labels = c("First-order index", "Total index"), name = " ") +
-    labs(title = "Crossings aggregation", y = "Parameters", x = "Sobol Index") +
+    labs(title = "Crossings aggregation", y = "Parameters", x = "Sobol Index", tag = "A") +
     scale_x_continuous(limits = c(0, 1)) +
     scale_y_discrete(limits = c("perceptual_range", "vision_angle", "scenario", "matrix_permeability"),
                      labels=c("vision_angle" = "Vision angle", "scenario" = "Scenarios",
@@ -49,7 +49,9 @@ assess_graph <- rbind(assess_first_graph, assess_total_graph)
           panel.grid.major.y = element_line(colour = "grey99"),
           legend.position = "bottom",
           legend.text = element_text(size = 11),
-          plot.title = element_text(size = 12))
+          plot.title = element_text(size = 12),
+          plot.tag = element_text(size = 11),
+          plot.tag.position = c(0.01,0.99))
 )
 
 
@@ -75,7 +77,7 @@ crossings_graph <- rbind(crossings_first_graph, crossings_total_graph) %>%
                     position = position_dodge(width = 0.3), size = 0.3) +
     scale_colour_manual(values = c("first-order" = "black", "total" = "grey50"),
                         labels = c("First-order index", "Total index"), name = " ") +
-    labs(title = "Total crossings", y = "Parameters", x = "Sobol Index") +
+    labs(title = "Total crossings", y = "Parameters", x = "Sobol Index", tag = "B") +
     scale_x_continuous(limits = c(0, 1)) +
     scale_y_discrete(limits = c("matrix_permeability", "vision_angle","perceptual_range", "scenario"),
                      labels=c("vision_angle" = "Vision angle", "scenario" = "Scenarios",
@@ -86,9 +88,12 @@ crossings_graph <- rbind(crossings_first_graph, crossings_total_graph) %>%
           panel.grid.major.y = element_line(colour = "grey99"),
           legend.position = "bottom",
           legend.text = element_text(size = 11),
-          plot.title = element_text(size = 12))
+          plot.title = element_text(size = 12),
+          plot.tag = element_text(size = 11),
+          plot.tag.position = c(0.01,0.99))
 )
 
-sensi_assess + sensi_cross + plot_layout(ncol = 2, guides = "collect") & theme(legend.position = 'bottom', legend.key.size = unit(1.5, 'cm'))
+sensi_assess + sensi_cross + plot_layout(ncol = 2, guides = "collect") & 
+  theme(legend.position = 'bottom', legend.key.size = unit(1, 'cm'))
 
                                                                                

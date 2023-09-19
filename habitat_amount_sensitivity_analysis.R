@@ -2,12 +2,12 @@ library(sensitivity)
 library(dplyr)
 library(here)
 library(ggplot2)
-library(gridExtra)
+library(patchwork)
 
 # obter inputs do objeto netlogo para adicionar na analise de sensibilidade
 # carregar o objeto netlogo - pasta results, arquivo habitat_amount_simulations.rds
 # inputs
-habitat_amount_simulations <- readRDS(here("results", "habitat_amount_6000amostras1.rds"))
+habitat_amount_simulations <- readRDS(here("results", "re", "habitat_amount_5mil1.rds"))
 random_sample_1 <- habitat_amount_simulations@simdesign@simobject[[1]][["X1"]]
 random_sample_2 <- habitat_amount_simulations@simdesign@simobject[[1]][["X2"]]
 experiment_design <- habitat_amount_simulations@simdesign@siminput
@@ -38,16 +38,20 @@ assess_graph <- rbind(assess_first_graph, assess_total_graph)
                    position = position_dodge(width = 0.3), size = 0.3) +
   scale_colour_manual(values = c("first-order" = "black", "total" = "grey50"),
                       labels = c("First-order index", "Total index"), name = " ") +
-  labs(title = "Asses top sections", y = "Parameters", x = "Sobol Index") +
+  labs(title = "Crossings aggregation", y = "Parameters", x = "Sobol Index", tag = "A") +
   scale_x_continuous(limits = c(0, 1)) +
   scale_y_discrete(limits = c("perceptual_range", "vision_angle", "proportion_of_habitat", "matrix_permeability"),
                    labels=c("vision_angle" = "Vision angle", "proportion_of_habitat" = "Proportion of habitat",
                             "perceptual_range" = "Perceptual range", "matrix_permeability" = "Matrix permeability")) +
-    theme(panel.background = element_rect(fill = "white"), 
+    theme(panel.background = element_rect(fill = "white"),
           legend.key = element_rect(fill = "white"),
           axis.line = element_line(color = "black"),
           panel.grid.major.y = element_line(colour = "grey99"),
-          legend.position = "bottom")
+          legend.position = "bottom",
+          legend.text = element_text(size = 11),
+          plot.title = element_text(size = 12),
+          plot.tag = element_text(size = 11),
+          plot.tag.position = c(0.01,0.99))
 )
 
 # total crossings
@@ -73,7 +77,7 @@ crossings_graph <- rbind(crossings_first_graph, crossings_total_graph) %>%
                   position = position_dodge(width = 0.3), size = 0.3) +
   scale_colour_manual(values = c("first-order" = "black", "total" = "grey50"),
                       labels = c("First-order index", "Total index"), name = " ") +
-  labs(title = "Total crossings", y = "Parameter", x = "Sobol Index") +
+  labs(title = "Total crossings", y = "Parameter", x = "Sobol Index", tag = "B") +
   scale_x_continuous(limits = c(0, 1)) +
   scale_y_discrete(limits = c("matrix_permeability", "vision_angle", "proportion_of_habitat", "perceptual_range"),
                   labels=c("vision_angle" = "Vision angle", "proportion_of_habitat" = "Proportion of habitat",
@@ -82,7 +86,13 @@ crossings_graph <- rbind(crossings_first_graph, crossings_total_graph) %>%
           legend.key = element_rect(fill = "white"),
           axis.line = element_line(color = "black"),
           panel.grid.major.y = element_line(colour = "grey99"),
-          legend.position = "bottom")
+          legend.position = "bottom",
+          legend.text = element_text(size = 11),
+          plot.title = element_text(size = 12),
+          plot.tag = element_text(size = 11),
+          plot.tag.position = c(0.01,0.99))
 )
 
-grid.arrange(sensi_assess, sensi_cross, ncol = 1)
+sensi_assess + sensi_cross + plot_layout(ncol = 2, guides = "collect") & 
+  theme(legend.position = 'bottom', legend.key.size = unit(1, 'cm'))
+
