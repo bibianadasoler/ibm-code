@@ -10,8 +10,8 @@ require(here)
 require(aomisc)
 
 # habitat amount submodel ----
-habitat_amount_simulations <- readRDS(here("results", "habitat_amount_6000amostras1.RDS"))
-habitat_amount_variables <- read.csv("/Users/bibianaterra/Library/CloudStorage/OneDrive-Personal/Doutorado/Predicao_ferrovias/ibm-code/results/habitat_5mais5.csv") #output_FINAL #habitat_amount_simulations@simdesign@simoutput
+habitat_amount <- readRDS(here("results", "habitat_amount_dezmil.RDS"))
+habitat_amount_variables <- habitat_amount@simdesign@simoutput
 
 # crossings aggregation ----
 ### proportion of habitat ----
@@ -26,8 +26,8 @@ exponential = nls(y ~ a + b*log(x), start = list(a = coefficients(linear)[1], b 
 # assintotic
 assintotic = nls(y ~ a + b/(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2])) 
 # BIC 
-BICtab(null, linear, exponential, assintotic, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
-exponential 
+BICtab(null, linear, exponential, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+#LINEAR 
 R2nls(exponential)
 # a       b 
 # 0.6549 -0.0489 
@@ -41,14 +41,12 @@ null = lm(y ~ 1)
 linear = lm(y ~ x)
 # exponential
 exponential = nls(y ~ a + b*log(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2]))
-# assintotic
-assintotic = nls(y ~ a + b/(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2])) 
 # BIC 
-BICtab(null, linear, exponential, assintotic, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+BICtab(null, linear, exponential,  nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
 exponential
 R2nls(exponential)
 # a       b 
-# 0.77566 -0.08088 
+# 0.9241 -0.1120 
 
 ### perceptual range ----
 y <- habitat_amount_variables$assess_top_sections
@@ -59,14 +57,12 @@ null = lm(y ~ 1)
 linear = lm(y ~ x)
 # exponential
 exponential = nls(y ~ a + b*log(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2]))
-# assintotic
-assintotic = nls(y ~ a + b/(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2])) 
 # BIC 
-BICtab(null, linear, exponential, assintotic, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
-linear
+BICtab(null, linear, exponential,  nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+exponential
 summary(linear)$adj.r.squared
 # a       b 
-# 0.389393 0.003446
+# 0.39359 0.03562
 
 ### vision angle ----
 y <- habitat_amount_variables$assess_top_sections
@@ -77,14 +73,12 @@ null = lm(y ~ 1)
 linear = lm(y ~ x)
 # exponential
 exponential = nls(y ~ a + b*log(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2]))
-# assintotic
-assintotic = nls(y ~ a + b/(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2])) 
 # BIC 
-BICtab(null, linear, exponential, assintotic, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+BICtab(null, linear, exponential, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
 linear
 summary(linear)$adj.r.squared
 # a       b 
-# 0.281138 0.001573
+# 0.286302 0.001593
 
 
 # total crossings ----
@@ -97,14 +91,12 @@ null = lm(y ~ 1)
 linear = lm(y ~ x)
 # exponential
 exponential = nls(y ~ a + b*log(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2]))
-# assintotic
-assintotic = nls(y ~ a + b/(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2])) 
 # BIC 
-BICtab(null, linear, exponential, assintotic, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
-assintotic
+BICtab(null, linear, exponential,  nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+linear
 R2nls(assintotic)
 # a       b 
-# 901.1 -940.0 
+# 565.793 2.163 
 
 ### matrix permeability ----
 y <- habitat_amount_variables$total_crossings
@@ -115,14 +107,12 @@ null = lm(y ~ 1)
 linear = lm(y ~ x)
 # exponential
 exponential = nls(y ~ a + b*log(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2]))
-# assintotic
-assintotic = nls(y ~ a + b/(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2])) 
 # BIC 
-BICtab(null, linear, exponential, assintotic, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
-linear
+BICtab(null, linear, exponential,  nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+exponential
 R2nls(exponential)
 # a       b 
-# 966.012 -1.814 
+# 356.54 84.09 
 
 ## perceptual range ----
 y <- habitat_amount_variables$total_crossings
@@ -133,14 +123,12 @@ null = lm(y ~ 1)
 linear = lm(y ~ x)
 # exponential
 exponential = nls(y ~ a + b*log(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2]))
-# assintotic
-assintotic = nls(y ~ a + b/(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2])) 
 # BIC 
-BICtab(null, linear, exponential, assintotic, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+BICtab(null, linear, exponential, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
 linear
 summary(linear)$adj.r.squared
 # a       b 
-# 616.39 11.02
+# 409.06 11.27
 
 ## vision angle ----
 y <- habitat_amount_variables$total_crossings
@@ -151,14 +139,12 @@ null = lm(y ~ 1)
 linear = lm(y ~ x)
 # exponential
 exponential = nls(y ~ a + b*log(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2]))
-# assintotic
-assintotic = nls(y ~ a + b/(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2])) 
 # BIC 
-BICtab(null, linear, exponential, assintotic, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+BICtab(null, linear, exponential, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
 exponential
 R2nls(exponential)
 # a       b 
-# -604.0 302.8
+# 347.61 66.79
 
 
 # graph ----

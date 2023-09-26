@@ -626,7 +626,7 @@ SWITCH
 578
 save_data?
 save_data?
-0
+1
 1
 -1000
 

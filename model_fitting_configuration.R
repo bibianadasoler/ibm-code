@@ -24,10 +24,8 @@ null = lm(y ~ 1)
 linear = lm(y ~ x)
 # exponential
 exponential = nls(y ~ a + b*log(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2]))
-# assintotic
-assintotic = nls(y ~ a + b/(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2])) 
 # BIC 
-BICtab(null, linear, exponential, assintotic, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+BICtab(null, linear, exponential, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
 exponential
 R2nls(exponential)
 # a       b 
@@ -43,10 +41,8 @@ null = lm(y ~ 1)
 linear = lm(y ~ x)
 # exponential
 exponential = nls(y ~ a + b*log(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2]))
-# assintotic
-assintotic = nls(y ~ a + b/(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2])) 
 #AIC 
-BICtab(null, linear, exponential, assintotic, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+BICtab(null, linear, exponential, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
 linear
 summary(linear)
 # a       b 
@@ -62,10 +58,8 @@ null = lm(y ~ 1)
 linear = lm(y ~ x)
 # exponential
 exponential = nls(y ~ a + b*log(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2]))
-# assintotic
-assintotic = nls(y ~ a + b/(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2])) 
-#AIC 
-BICtab(null, linear, exponential, assintotic, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+# BIC 
+BICtab(null, linear, exponential,  nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
 linear
 summary(linear)
 # a       b 
@@ -83,10 +77,8 @@ null = lm(y ~ 1)
 linear = lm(y ~ x)
 # exponential
 exponential = nls(y ~ a + b*log(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2]))
-# assintotic
-assintotic = nls(y ~ a + b/(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2])) 
-#AIC 
-BICtab(null, linear, exponential, assintotic, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+# BIC 
+BICtab(null, linear, exponential,  nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
 exponential
 R2nls(exponential)
 # a       b 
@@ -102,10 +94,8 @@ null = lm(y ~ 1)
 linear = lm(y ~ x)
 # exponential
 exponential = nls(y ~ a + b*log(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2]))
-# assintotic
-assintotic = nls(y ~ a + b/(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2])) 
-#AIC 
-BICtab(null, linear, exponential, assintotic, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+# BIC 
+BICtab(null, linear, exponential,  nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
 linear
 summary(linear)
 # a       b 
@@ -121,15 +111,13 @@ null = lm(y ~ 1)
 linear = lm(y ~ x)
 # exponential
 exponential = nls(y ~ a + b*log(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2]))
-# assintotic
-assintotic = nls(y ~ a + b/(x), start = list(a = coefficients(linear)[1], b = coefficients(linear)[2])) 
-#AIC 
-BICtab(null, linear, exponential, assintotic, nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
-assintotic
-R2nls(assintotic)
+# BIC 
+BICtab(null, linear, exponential,  nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+exponential
+R2nls(exponential)
 # a       b 
-# 1141 -38784
-# PseudoR2 0.01892259
+# -644.3 304.3
+# PseudoR2 0.01887016
 
 # graph ----
 plot(y ~ x, xlab = "perm", ylab = "aggreg", pch = 20, cex = 0.5)
