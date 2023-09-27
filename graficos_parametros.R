@@ -3,26 +3,30 @@
 # graficos para cada parametro 
 #
 #
-library(meantables)
 library(dplyr)
+library(aomisc)
 library(ggplot2)
 library(ggdist)
 library(gridExtra)
+library(grid)
 library(here)
 
 # Submodel habitat amount ----
-habitat_amount <- readRDS(here("results", "habitat_amount_dezmil.RDS"))
+habitat_amount <- readRDS(here("results", "habitat_amount_simulations.RDS"))
 habitat_amount_simulations <- habitat_amount@simdesign@simoutput
 #### Assess top sections ----
 
 ##### Proportion of habitat ----
-# linear
+# bragg4
+bragg4 <- drm(habitat_amount_simulations$assess_top_sections ~ habitat_amount_simulations$proportion_of_habitat, fct = DRC.bragg.4())
+x_values <- 10:max(habitat_amount_simulations$proportion_of_habitat)
+y_values <- coefficients(bragg4)[2] + (coefficients(bragg4)[3] - coefficients(bragg4)[2]) * exp(- coefficients(bragg4)[1] * (x_values - coefficients(bragg4)[4])^2)
 (assess_prop_habitat_amount <- ggplot(data = habitat_amount_simulations, aes(x = proportion_of_habitat, y = assess_top_sections)) +
   annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.25, ymax = 1, alpha = 0.15, fill = "red") +
   annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.5, ymax = 1, alpha = 0.15, fill = "red") +
   annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.75, ymax = 1, alpha = 0.15, fill = "red") +
   geom_point(size = 0.05) +
-  geom_smooth(method = "lm", col = "red", linewidth = 0.5) +
+  geom_line(data = data.frame(x = x_values, y = y_values), aes(x, y), col = "red", linewidth = 0.5) +
   ylim(0,1) + scale_x_continuous(breaks = c(10,30,50,70,90), expand = c(0,0.5)) +
   geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
   labs(y = "Crossings aggregation", x = "Proportion of habitat", tag = "A") +  
@@ -33,11 +37,10 @@ habitat_amount_simulations <- habitat_amount@simdesign@simoutput
 )
 
 ##### Matrix permeability ----
-# exponential 
-a <- 0.9241
-b <- -0.1120
+# asymptotic 
+asymptotic <- drm(habitat_amount_simulations$assess_top_sections ~ habitat_amount_simulations$matrix_permeability, fct = DRC.asymReg())
 x_values <- 10:max(habitat_amount_simulations$matrix_permeability)
-y_values <- a + b * log(x_values)
+y_values <- coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coefficients(asymptotic)[1]) * exp (- coefficients(asymptotic)[2] * x_values)
 (assess_perm_habitat_amount <- ggplot(data = habitat_amount_simulations, aes(x = matrix_permeability, y = assess_top_sections)) +
    annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.25, ymax = 1, alpha = 0.15, fill = "red") +
    annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.5, ymax = 1, alpha = 0.15, fill = "red") +
@@ -54,11 +57,10 @@ y_values <- a + b * log(x_values)
 )
 
 ##### Perceptual range ----
-# exponential
-a <- 0.39359
-b <- 0.03562
+# asymptotic 
+asymptotic <- drm(habitat_amount_simulations$assess_top_sections ~ habitat_amount_simulations$perceptual_range, fct = DRC.asymReg())
 x_values <- 5:max(habitat_amount_simulations$perceptual_range)
-y_values <- a + b * log(x_values)
+y_values <- coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coefficients(asymptotic)[1]) * exp (- coefficients(asymptotic)[2] * x_values)
 (assess_percep_habitat_amount <- ggplot(data = habitat_amount_simulations, aes(x = perceptual_range, y = assess_top_sections)) +
    annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.25, ymax = 1, alpha = 0.15, fill = "red") +
    annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.5, ymax = 1, alpha = 0.15, fill = "red") +
@@ -75,13 +77,16 @@ y_values <- a + b * log(x_values)
 )
 
 ##### Vision angle ----
-# linear 
+# exponential 
+exponential_growth <- drm(habitat_amount_simulations$assess_top_sections ~ habitat_amount_simulations$vision_angle, fct = DRC.expoGrowth())
+x_values <- 90:max(habitat_amount_simulations$vision_angle)
+y_values <- coefficients(exponential_growth)[1] * exp(coefficients(exponential_growth)[2] * x_values)
 (assess_vision_habitat_amount <-ggplot(data = habitat_amount_simulations, aes(x = vision_angle, y = assess_top_sections)) +
    annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.25, ymax = 1, alpha = 0.15, fill = "red") +
    annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.5, ymax = 1, alpha = 0.15, fill = "red") +
    annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.75, ymax = 1, alpha = 0.15, fill = "red") +
    geom_point(size = 0.05) +
-   geom_smooth(method = "lm", col = "red", linewidth = 0.5) +
+   geom_line(data = data.frame(x = x_values, y = y_values), aes(x, y), col = "red", linewidth = 0.5) +
    ylim(0,1) + scale_x_continuous(breaks = c(90, 120, 150, 180), expand = c(0,0.5)) +
    geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
    labs(y = "Crossings aggregation", x = "Vision angle", tag = "D") +
@@ -92,10 +97,13 @@ y_values <- a + b * log(x_values)
 )
 #### Total crossings ----
 ##### Proportion of habitat ----
-# linear
+# bragg4
+bragg4 <- drm(habitat_amount_simulations$total_crossings ~ habitat_amount_simulations$proportion_of_habitat, fct = DRC.bragg.4())
+x_values <- 10:max(habitat_amount_simulations$proportion_of_habitat)
+y_values <- coefficients(bragg4)[2] + (coefficients(bragg4)[3] - coefficients(bragg4)[2]) * exp(- coefficients(bragg4)[1] * (x_values - coefficients(bragg4)[4])^2)
 (crossings_prop_habitat_amount <- ggplot(data = habitat_amount_simulations, aes(x = proportion_of_habitat, y = total_crossings)) +
    geom_point(size = 0.05) +
-   geom_smooth(method = "lm", col = "red", linewidth = 0.5) +
+   geom_line(data = data.frame(x = x_values, y = y_values), aes(x, y), col = "red", linewidth = 0.5) +
    labs(y = "Total crossings", x = "Proportion of habitat", tag = "A") +
    scale_y_continuous(breaks =  c(0, 500, 1000, 1500), limits = c(0, 1500)) +
    scale_x_continuous(breaks = c(10,25,50,75,90), expand = c(0,0.5)) +
@@ -107,11 +115,10 @@ y_values <- a + b * log(x_values)
 )
 
 ##### Matrix permeability ----
-# exponencial
-a <- 356.54
-b <- 84.09
+# asymptotic 
+asymptotic <- drm(habitat_amount_simulations$total_crossings ~ habitat_amount_simulations$matrix_permeability, fct = DRC.asymReg())
 x_values <- 10:max(habitat_amount_simulations$matrix_permeability)
-y_values <- a + b * log(x_values)
+y_values <- coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coefficients(asymptotic)[1]) * exp (- coefficients(asymptotic)[2] * x_values)
 (crossings_perm_habitat_amount <- ggplot(data = habitat_amount_simulations, aes(x = matrix_permeability, y = total_crossings)) +
    geom_point(size = 0.05) +
    geom_line(data = data.frame(x = x_values, y = y_values), aes(x, y), col = "red", linewidth = 0.5) +
@@ -126,10 +133,13 @@ y_values <- a + b * log(x_values)
 )
 
 ##### Perceptual range ----
-# linear
+# bragg4
+bragg4 <- drm(habitat_amount_simulations$total_crossings ~ habitat_amount_simulations$perceptual_range, fct = DRC.bragg.4())
+x_values <- 5:max(habitat_amount_simulations$perceptual_range)
+y_values <- coefficients(bragg4)[2] + (coefficients(bragg4)[3] - coefficients(bragg4)[2]) * exp(- coefficients(bragg4)[1] * (x_values - coefficients(bragg4)[4])^2)
 (crossings_percep_habitat_amount <- ggplot(data = habitat_amount_simulations, aes(x = perceptual_range, y = total_crossings)) +
    geom_point(size = 0.05) +
-   geom_smooth(method = "lm", col = "red", linewidth = 0.5) +
+   geom_line(data = data.frame(x = x_values, y = y_values), aes(x, y), col = "red", linewidth = 0.5) +
    labs(y = "Total crossings", x = "Perceptual range", tag = "C") +
    scale_y_continuous(breaks =  c(0, 500, 1000, 1500), limits = c(0, 1500)) +
    scale_x_continuous(breaks = c(5, 15, 25, 35, 42), expand = c(0,0.5)) +
@@ -140,16 +150,15 @@ y_values <- a + b * log(x_values)
          plot.tag.position = c(0.02,1))
 )
 ##### Vision angle ----
-# exponential
-a <- 347.61
-b <- 66.79
+# asymptotic 
+asymptotic <- drm(habitat_amount_simulations$total_crossings ~ habitat_amount_simulations$vision_angle, fct = DRC.asymReg())
 x_values <- 90:max(habitat_amount_simulations$vision_angle)
-y_values <- a + b * log(x_values)
+y_values <- coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coefficients(asymptotic)[1]) * exp (- coefficients(asymptotic)[2] * x_values)
 (crossings_vision_habitat_amount <- ggplot(data = habitat_amount_simulations, aes(x = vision_angle, y = total_crossings)) +
    geom_point(size = 0.05) +
    geom_line(data = data.frame(x = x_values, y = y_values), aes(x, y), col = "red", linewidth = 0.5) +
    labs(y = "Total crossings", x = "Vision angle", tag = "D") +
-    scale_y_continuous(breaks =  c(0, 500, 1000, 1500), limits = c(0, 1500)) +
+   scale_y_continuous(breaks =  c(0, 500, 1000, 1500), limits = c(0, 1500)) +
    scale_x_continuous(breaks = c(90, 120, 150, 180), expand = c(0,0.5)) +
    theme(panel.background = element_rect(fill = "white"), 
          panel.border = element_rect(fill = NA, colour = "grey20"), 
@@ -165,8 +174,8 @@ y_values <- a + b * log(x_values)
 
 
 # Submodel configuration ----
-configuration_simulations <- readRDS(here("results", "configuration_simulations_dezmil.RDS"))
-configuration_simulations <- configuration_simulations@simdesign@simoutput
+configuration <- readRDS(here("results", "configuration_simulations.RDS"))
+configuration_simulations <- configuration@simdesign@simoutput
 #### Assess top sections ----
 ##### Scenarios ----
 (assess_scenarios_config <- ggplot(configuration_simulations, aes(x = factor(scenario), y = assess_top_sections)) +
@@ -186,11 +195,10 @@ configuration_simulations <- configuration_simulations@simdesign@simoutput
          plot.tag.position = c(0.02,1))
 )
 ##### Matrix permeability ----
-# exponential 
-a <- 0.8930
-b <- -0.1052
+# asymptotic 
+asymptotic <- drm(configuration_simulations$assess_top_sections ~ configuration_simulations$matrix_permeability, fct = DRC.asymReg())
 x_values <- 10:max(configuration_simulations$matrix_permeability)
-y_values <- a + b * log(x_values)
+y_values <- coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coefficients(asymptotic)[1]) * exp (- coefficients(asymptotic)[2] * x_values)
 (assess_perm_config <- ggplot(configuration_simulations, aes(x = matrix_permeability, y = assess_top_sections)) +
    annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.25, ymax = 1, alpha = 0.15, fill = "red") +
    annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.5, ymax = 1, alpha = 0.15, fill = "red") +
@@ -207,13 +215,16 @@ y_values <- a + b * log(x_values)
 )
 
 ##### Perceptual range ----
-# linear
+# exponential 
+exponential_growth <- drm(configuration_simulations$assess_top_sections ~ configuration_simulations$perceptual_range, fct = DRC.expoGrowth())
+x_values <- 5:max(configuration_simulations$perceptual_range)
+y_values <- coefficients(exponential_growth)[1] * exp(coefficients(exponential_growth)[2] * x_values)
 (assess_percep_config <- ggplot(data = configuration_simulations, aes(x = perceptual_range, y = assess_top_sections)) +
    annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.25, ymax = 1, alpha = 0.15, fill = "red") +
    annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.5, ymax = 1, alpha = 0.15, fill = "red") +
    annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.75, ymax = 1, alpha = 0.15, fill = "red") +
    geom_point(size = 0.05) +
-   geom_smooth(method = "lm", col = "red", linewidth = 0.5) +
+   geom_line(data = data.frame(x = x_values, y = y_values), aes(x, y), col = "red", linewidth = 0.5) +
    labs(y = "Crossings aggregation", x = "Perceptual range", tag = "G") +
    ylim(0,1) + scale_x_continuous(breaks = c(5, 15, 25, 35, 42), expand = c(0,0.5)) +
    geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
@@ -257,11 +268,9 @@ y_values <- a + b * log(x_values)
  ) 
 
 ##### Matrix permeability ----
-# exponential
-a <- 1171.28 
-b <- -87.09 
+asymptotic <- drm(configuration_simulations$total_crossings ~ configuration_simulations$matrix_permeability, fct = DRC.asymReg())
 x_values <- 10:max(configuration_simulations$matrix_permeability)
-y_values <- a + b * log(x_values)
+y_values <- coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coefficients(asymptotic)[1]) * exp (- coefficients(asymptotic)[2] * x_values)
 (crossings_perm_config <- ggplot(data = configuration_simulations, aes(x = matrix_permeability, y = total_crossings)) +
    geom_point(size = 0.05) +
    geom_line(data = data.frame(x = x_values, y = y_values), aes(x, y), col = "red", linewidth = 0.5) +
@@ -276,10 +285,13 @@ y_values <- a + b * log(x_values)
 )
 
 ##### Perceptual range ----
-# linear
+# exponential 
+exponential_growth <- drm(configuration_simulations$total_crossings ~ configuration_simulations$perceptual_range, fct = DRC.expoGrowth())
+x_values <- 5:max(configuration_simulations$perceptual_range)
+y_values <- coefficients(exponential_growth)[1] * exp(coefficients(exponential_growth)[2] * x_values)
 (crossings_percep_config <- ggplot(data = configuration_simulations, aes(x = perceptual_range, y = total_crossings)) +
    geom_point(size = 0.05) +
-   geom_smooth(method = "lm", col = "red", linewidth = 0.5) +
+   geom_line(data = data.frame(x = x_values, y = y_values), aes(x, y), col = "red", linewidth = 0.5) +
    labs(y = "Total crossings", x = "Perceptual range", tag = "G") +
    scale_y_continuous(breaks =  c(0, 600, 1200, 1800, 2400, 3000, 3600), limits = c(0,3600)) +
    scale_x_continuous(breaks = c(5, 15, 25, 35, 42), expand = c(0,0.5)) +
@@ -291,11 +303,9 @@ y_values <- a + b * log(x_values)
 )
 
 ##### Vision angle ----
-# exponential
-a <- -644.3
-b <- 304.3
+asymptotic <- drm(configuration_simulations$total_crossings ~ configuration_simulations$vision_angle, fct = DRC.asymReg())
 x_values <- 90:max(configuration_simulations$vision_angle)
-y_values <- a + b * log(x_values)
+y_values <- coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coefficients(asymptotic)[1]) * exp (- coefficients(asymptotic)[2] * x_values)
 (crossings_vision_config <- ggplot(data = configuration_simulations, aes(x = vision_angle, y = total_crossings)) +
    geom_point(size = 0.05) +
    geom_line(data = data.frame(x = x_values, y = y_values), aes(x, y), col = "red", linewidth = 0.5) +
