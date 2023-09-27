@@ -2,6 +2,7 @@
 
 * pasta raiz:
   Código netlogo - crossings.nlogo
+
   Scripts
     - simulations: usado para fazer as simulacoes usando o pacote nlrx - precisa ter o netlogo versao 6.0.4 no computador
     - sensitivity_analysis: usado para fazer a analise e graficos de sensibilidade, com pacote sensitivity e metodo sobol2007, usando os resultados do script "simulations_sobol_design" 
