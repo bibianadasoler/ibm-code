@@ -7,7 +7,7 @@ library(patchwork)
 # obter inputs do objeto netlogo para adicionar na analise de sensibilidade
 # carregar o objeto netlogo - pasta results, arquivo configuration_simulations.rds
 # inputs
-configuration_simulations <- readRDS(file = here("results", "configuration_simulations_dezmil.rds"))
+configuration_simulations <- readRDS(file = here("results", "configuration_simulations.rds"))
 random_sample_1 <- configuration_simulations@simdesign@simobject[[1]][["X1"]]
 random_sample_2 <- configuration_simulations@simdesign@simobject[[1]][["X2"]]
 experiment_design <- configuration_simulations@simdesign@siminput
@@ -37,7 +37,7 @@ assess_graph <- rbind(assess_first_graph, assess_total_graph)
     geom_pointrange(aes(xmin = `min. c.i.`, xmax = `max. c.i.`, color = index), 
                     position = position_dodge(width = 0.3), size = 0.3) +
     scale_colour_manual(values = c("first-order" = "black", "total" = "grey50"),
-                        labels = c("First-order index", "Total index"), name = " ") +
+                        labels = c("Main effect (*Si*)", "Total effect (*STi*)"), name = " ") +
     labs(title = "Crossings aggregation", y = "Parameters", x = "Sobol Index", tag = "A") +
     scale_x_continuous(limits = c(0, 1)) +
     scale_y_discrete(limits = c("perceptual_range", "vision_angle", "scenario", "matrix_permeability"),
@@ -48,7 +48,7 @@ assess_graph <- rbind(assess_first_graph, assess_total_graph)
           axis.line = element_line(color = "black"),
           panel.grid.major.y = element_line(colour = "grey99"),
           legend.position = "bottom",
-          legend.text = element_text(size = 11),
+          legend.text = element_markdown(size = 11),
           plot.title = element_text(size = 12),
           plot.tag = element_text(size = 11),
           plot.tag.position = c(0.01,0.99))
@@ -76,7 +76,7 @@ crossings_graph <- rbind(crossings_first_graph, crossings_total_graph) %>%
     geom_pointrange(aes(xmin = `min. c.i.`, xmax = `max. c.i.`, color = index), 
                     position = position_dodge(width = 0.3), size = 0.3) +
     scale_colour_manual(values = c("first-order" = "black", "total" = "grey50"),
-                        labels = c("First-order index", "Total index"), name = " ") +
+                        labels = c("Main effect (*Si*)", "Total effect (*STi*)"), name = " ") +
     labs(title = "Total crossings", y = "Parameters", x = "Sobol Index", tag = "B") +
     scale_x_continuous(limits = c(0, 1)) +
     scale_y_discrete(limits = c("matrix_permeability", "vision_angle","perceptual_range", "scenario"),
@@ -87,7 +87,7 @@ crossings_graph <- rbind(crossings_first_graph, crossings_total_graph) %>%
           axis.line = element_line(color = "black"),
           panel.grid.major.y = element_line(colour = "grey99"),
           legend.position = "bottom",
-          legend.text = element_text(size = 11),
+          legend.text = element_markdown(size = 11),
           plot.title = element_text(size = 12),
           plot.tag = element_text(size = 11),
           plot.tag.position = c(0.01,0.99))
