@@ -2,6 +2,7 @@ library(sensitivity)
 library(dplyr)
 library(here)
 library(ggplot2)
+library(ggtext)
 library(patchwork)
 
 # obter inputs do objeto netlogo para adicionar na analise de sensibilidade
@@ -23,7 +24,6 @@ sensitivity_assess$X <- experiment_design
 # bias corrected 
 tell(sensitivity_assess, (assess_values-mean(assess_values))/sd(assess_values))
 print(sensitivity_assess)
-plot(sensitivity_assess)
 
 assess_first_graph <- sensitivity_assess[["S"]] %>%
   mutate(parameter = row.names(.),
@@ -37,7 +37,7 @@ assess_graph <- rbind(assess_first_graph, assess_total_graph)
   geom_pointrange(aes(xmin = `min. c.i.`, xmax = `max. c.i.`, color = index), 
                    position = position_dodge(width = 0.3), size = 0.3) +
   scale_colour_manual(values = c("first-order" = "black", "total" = "grey50"),
-                      labels = c("Main effect (*Si*)", "Total effect (*STi*)"), name = " ") +
+                      labels = c("Main effect (*S<sub>i</sub>*)", "Total effect (*S<sub>Ti</sub>*)"), name = " ") +
   labs(title = "Crossings aggregation", y = "Parameters", x = "Sobol Index", tag = "A") +
   scale_x_continuous(limits = c(0, 1)) +
   scale_y_discrete(limits = c("perceptual_range", "vision_angle", "proportion_of_habitat", "matrix_permeability"),
@@ -48,6 +48,8 @@ assess_graph <- rbind(assess_first_graph, assess_total_graph)
           axis.line = element_line(color = "black"),
           panel.grid.major.y = element_line(colour = "grey99"),
           legend.position = "bottom",
+          axis.text = element_text(size = 12),
+          axis.title = element_text(size = 12),
           legend.text = element_markdown(size = 11),
           plot.title = element_text(size = 12),
           plot.tag = element_text(size = 11),
@@ -60,7 +62,6 @@ sensitivity_crossings$X <- experiment_design
 # bias corrected 
 tell(sensitivity_crossings, (crossings_values-mean(crossings_values))/sd(crossings_values))
 print(sensitivity_crossings)
-plot(sensitivity_crossings)
 
 crossings_first_graph <- sensitivity_crossings[["S"]] %>%
   mutate(parameter = row.names(.),
@@ -76,7 +77,7 @@ crossings_graph <- rbind(crossings_first_graph, crossings_total_graph) %>%
   geom_pointrange(aes(xmin = `min. c.i.`, xmax = `max. c.i.`, color = index), 
                   position = position_dodge(width = 0.3), size = 0.3) +
   scale_colour_manual(values = c("first-order" = "black", "total" = "grey50"),
-                      labels = c("Main effect (*Si*)", "Total effect (*STi*)"), name = " ") +
+                      labels = c("Main effect (*S<sub>i</sub>*)", "Total effect (*S<sub>Ti</sub>*)"), name = " ") +
   labs(title = "Total crossings", y = "Parameter", x = "Sobol Index", tag = "B") +
   scale_x_continuous(limits = c(0, 1)) +
   scale_y_discrete(limits = c("vision_angle", "matrix_permeability",  "proportion_of_habitat", "perceptual_range"),
@@ -87,12 +88,16 @@ crossings_graph <- rbind(crossings_first_graph, crossings_total_graph) %>%
           axis.line = element_line(color = "black"),
           panel.grid.major.y = element_line(colour = "grey99"),
           legend.position = "bottom",
+          axis.text = element_text(size = 12),
+          axis.title = element_text(size = 12),
           legend.text = element_markdown(size = 11),
           plot.title = element_text(size = 12),
           plot.tag = element_text(size = 11),
           plot.tag.position = c(0.01,0.99))
 )
 
-sensi_assess + sensi_cross + plot_layout(ncol = 2, guides = "collect") & 
-  theme(legend.position = 'bottom', legend.key.size = unit(1, 'cm'))
-# 1066 x 447
+sensi_together <- sensi_assess + sensi_cross + plot_layout(ncol = 2, guides = "collect") & 
+  theme(legend.position = 'bottom', legend.key.size = unit(1, 'cm'), legend.text = element_markdown(size = 12)) 
+
+ggsave(sensi_together, filename = here("imagens", "sensitivity_habitat_amount.png"), 
+       dpi = 600, width = 10000, height = 5800, unit = "px")
