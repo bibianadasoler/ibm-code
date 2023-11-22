@@ -124,7 +124,7 @@ plot(Y ~ X, pch = 20, cex = 0.5)
 lines(coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coefficients(asymptotic)[1]) * exp (- coefficients(asymptotic)[2] * x_values), col = "yellow", lwd = 3)
 
 
-# all graphs ----
+# all plots ----
 x_values <- 1:max(X) 
 plot(Y ~ X, pch = 20, cex = 0.5)
 abline(null, col = "green", lwd = 3)
