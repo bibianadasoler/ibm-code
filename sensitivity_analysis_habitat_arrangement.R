@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ##
 ## Article: Wildlife road crossings are not everywhere: a theoretical approach 
 ## for maximizing mitigation
