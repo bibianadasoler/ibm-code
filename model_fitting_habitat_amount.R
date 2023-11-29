@@ -1,170 +1,164 @@
+##
+## Article: Wildlife road crossings are not everywhere: a theoretical approach 
+## for maximizing mitigation
+## doi: 
+#
+## Script to evaluated the shape of the response curve between inputs and outputs 
+## by conducting a model selection procedure considering the following candidate 
+## models: null (intercept-only), linear, exponential, asymptotic, and Bragg (ie., unimodal response)
+## Model: Habitat amount
+#
+
+# loading packages
 library(aomisc)
 library(bbmle)
-library(here)
 
-# habitat amount data ----
-habitat_amount <- readRDS(here("results", "habitat_amount_simulations.RDS"))
+# load file with simulations information
+habitat_amount <- readRDS(here::here("results", "habitat_amount_simulations.RDS"))
 habitat_amount_variables <- habitat_amount@simdesign@simoutput
 
-# crossings aggregation ----
-### proportion of habitat ----
+# Crossings aggregation output ----
+### Proportion of habitat ----
 Y <- habitat_amount_variables$assess_top_sections
 X <- habitat_amount_variables$proportion_of_habitat
 variables <- data.frame(Y, X)
 
+# candidate models
 null <- lm(Y ~ 1)
 linear <- drm(Y ~ X, fct = DRC.linear(), data = variables)
 exponential_growth <- drm(Y ~ X, fct = DRC.expoGrowth(), data = variables)
 asymptotic <- drm(Y ~ X, fct = DRC.asymReg(), data = variables)
 bragg4 <- drm(Y ~ X, fct = DRC.bragg.4(), data = variables)
 
+# model selection
 BICtab(null, linear, exponential_growth, asymptotic, bragg4,
                 nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+# r2
 R2nls(bragg4)
-x_values <- 1:max(X) 
-plot(Y ~ X, pch = 20, cex = 0.5)
-lines(coefficients(bragg4)[2] + (coefficients(bragg4)[3] - coefficients(bragg4)[2]) * exp(- coefficients(bragg4)[1] * (x_values - coefficients(bragg4)[4])^2) , col = "purple", lwd = 3)
 
-### matrix permeability ----
+### Matrix permeability ----
 Y <- habitat_amount_variables$assess_top_sections
 X <- habitat_amount_variables$matrix_permeability
 variables <- data.frame(Y, X)
 
+# candidate models
 null <- lm(Y ~ 1)
 linear <- drm(Y ~ X, fct = DRC.linear(), data = variables)
 exponential_growth <- drm(Y ~ X, fct = DRC.expoGrowth(), data = variables)
 asymptotic <- drm(Y ~ X, fct = DRC.asymReg(), data = variables)
 bragg4 <- drm(Y ~ X, fct = DRC.bragg.4(), data = variables)
 
+# model selection
 BICtab(null, linear, exponential_growth, asymptotic, bragg4,
        nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+# r2
 R2nls(asymptotic)
-x_values <- 1:max(X) 
-plot(Y ~ X, pch = 20, cex = 0.5)
-lines(coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coefficients(asymptotic)[1]) * exp (- coefficients(asymptotic)[2] * x_values), col = "yellow", lwd = 3)
 
-
-### perceptual range ----
+### Perceptual range ----
 Y <- habitat_amount_variables$assess_top_sections
 X <- habitat_amount_variables$perceptual_range
 variables <- data.frame(Y, X)
 
+# candidate models
 null <- lm(Y ~ 1)
 linear <- drm(Y ~ X, fct = DRC.linear(), data = variables)
 exponential_growth <- drm(Y ~ X, fct = DRC.expoGrowth(), data = variables)
 asymptotic <- drm(Y ~ X, fct = DRC.asymReg(), data = variables)
 bragg4 <- drm(Y ~ X, fct = DRC.bragg.4(), data = variables)
 
+# model selection
 BICtab(null, linear, exponential_growth, asymptotic, bragg4,
        nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+# r2
 R2nls(asymptotic)
-x_values <- 1:max(X) 
-plot(Y ~ X, pch = 20, cex = 0.5)
-lines(coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coefficients(asymptotic)[1]) * exp (- coefficients(asymptotic)[2] * x_values), col = "yellow", lwd = 3)
 
-### vision angle ----
+### Vision angle ----
 Y <- habitat_amount_variables$assess_top_sections
 X <- habitat_amount_variables$vision_angle
 variables <- data.frame(Y, X)
 
+# candidate models
 null <- lm(Y ~ 1)
 linear <- drm(Y ~ X, fct = DRC.linear(), data = variables)
 exponential_growth <- drm(Y ~ X, fct = DRC.expoGrowth(), data = variables)
 asymptotic <- drm(Y ~ X, fct = DRC.asymReg(), data = variables)
 bragg4 <- drm(Y ~ X, fct = DRC.bragg.4(), data = variables)
 
+# model selection
 BICtab(null, linear, exponential_growth, asymptotic, bragg4,
        nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+# r2
 R2nls(exponential_growth)
-x_values <- 1:max(X) 
-plot(Y ~ X, pch = 20, cex = 0.5)
-lines(coefficients(exponential_growth)[1] * exp(coefficients(exponential_growth)[2] * x_values), col = "pink", lwd = 3)
 
-
-# total crossings ----
-### proportion of habitat ----
+# Total crossings output ----
+### Proportion of habitat ----
 Y <- habitat_amount_variables$total_crossings
 X <- habitat_amount_variables$proportion_of_habitat
 variables <- data.frame(Y, X)
 
+# candidate models
 null <- lm(Y ~ 1)
 linear <- drm(Y ~ X, fct = DRC.linear(), data = variables)
 exponential_growth <- drm(Y ~ X, fct = DRC.expoGrowth(), data = variables)
 asymptotic <- drm(Y ~ X, fct = DRC.asymReg(), data = variables)
 bragg4 <- drm(Y ~ X, fct = DRC.bragg.4(), data = variables)
 
+# model selection
 BICtab(null, linear, exponential_growth, asymptotic, bragg4,
        nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+# r2
 R2nls(bragg4)
-x_values <- 1:max(X) 
-plot(Y ~ X, pch = 20, cex = 0.5)
-lines(coefficients(bragg4)[2] + (coefficients(bragg4)[3] - coefficients(bragg4)[2]) * exp(- coefficients(bragg4)[1] * (x_values - coefficients(bragg4)[4])^2) , col = "purple", lwd = 3)
 
-
-### matrix permeability ----
+### Matrix permeability ----
 Y <- habitat_amount_variables$total_crossings
 X <- habitat_amount_variables$matrix_permeability
 variables <- data.frame(Y, X)
 
+# candidate models
 null <- lm(Y ~ 1)
 linear <- drm(Y ~ X, fct = DRC.linear(), data = variables)
 exponential_growth <- drm(Y ~ X, fct = DRC.expoGrowth(), data = variables)
 asymptotic <- drm(Y ~ X, fct = DRC.asymReg(), data = variables)
 bragg4 <- drm(Y ~ X, fct = DRC.bragg.4(), data = variables)
 
+# model selection
 BICtab(null, linear, exponential_growth, asymptotic, bragg4,
        nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+# r2
 R2nls(asymptotic)
-x_values <- 1:max(X) 
-plot(Y ~ X, pch = 20, cex = 0.5)
-lines(coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coefficients(asymptotic)[1]) * exp (- coefficients(asymptotic)[2] * x_values), col = "yellow", lwd = 3)
 
-
-### perceptual range ----
+### Perceptual range ----
 Y <- habitat_amount_variables$total_crossings
 X <- habitat_amount_variables$perceptual_range
 variables <- data.frame(Y, X)
 
+# candidate models
 null <- lm(Y ~ 1)
 linear <- drm(Y ~ X, fct = DRC.linear(), data = variables)
 exponential_growth <- drm(Y ~ X, fct = DRC.expoGrowth(), data = variables)
 asymptotic <- drm(Y ~ X, fct = DRC.asymReg(), data = variables)
 bragg4 <- drm(Y ~ X, fct = DRC.bragg.4(), data = variables)
 
+# model selection
 BICtab(null, linear, exponential_growth, asymptotic, bragg4,
        nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+# r2
 R2nls(bragg4)
-x_values <- 1:max(X) 
-plot(Y ~ X, pch = 20, cex = 0.5)
-lines(coefficients(bragg4)[2] + (coefficients(bragg4)[3] - coefficients(bragg4)[2]) * exp(- coefficients(bragg4)[1] * (x_values - coefficients(bragg4)[4])^2) , col = "purple", lwd = 3)
 
-
-### vision angle ----
+### Vision angle ----
 Y <- habitat_amount_variables$total_crossings
 X <- habitat_amount_variables$vision_angle
 variables <- data.frame(Y, X)
 
+# candidate models
 null <- lm(Y ~ 1)
 linear <- drm(Y ~ X, fct = DRC.linear(), data = variables)
 exponential_growth <- drm(Y ~ X, fct = DRC.expoGrowth(), data = variables)
 asymptotic <- drm(Y ~ X, fct = DRC.asymReg(), data = variables)
 bragg4 <- drm(Y ~ X, fct = DRC.bragg.4(), data = variables)
 
+# model selection
 BICtab(null, linear, exponential_growth, asymptotic, bragg4,
        nobs = 100, weights = TRUE, delta = TRUE, base = TRUE)
+# r2
 R2nls(asymptotic)
-x_values <- 1:max(X) 
-plot(Y ~ X, pch = 20, cex = 0.5)
-lines(coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coefficients(asymptotic)[1]) * exp (- coefficients(asymptotic)[2] * x_values), col = "yellow", lwd = 3)
-
-
-# all graphs ----
-x_values <- 1:max(X) 
-plot(Y ~ X, pch = 20, cex = 0.5)
-abline(null, col = "green", lwd = 3)
-abline(linear, col = "red", lwd = 3)
-lines(coefficients(exponential_growth)[1] * exp(coefficients(exponential_growth)[2] * x_values), col = "pink", lwd = 3)
-lines(coefficients(bragg4)[2] + (coefficients(bragg4)[3] - coefficients(bragg4)[2]) * exp(- coefficients(bragg4)[1] * (x_values - coefficients(bragg4)[4])^2) , col = "purple", lwd = 3)
-lines(coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coefficients(asymptotic)[1]) * exp (- coefficients(asymptotic)[2] * x_values), col = "yellow", lwd = 3)
-
-# asymptotic a - (a - b) * (exp(-c * X); a = plateau; b = init; c = m
