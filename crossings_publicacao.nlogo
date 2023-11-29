@@ -30,14 +30,14 @@ to setup
   ]
 
   ; types of landscapes that will be generated
-  if submodel = "Habitat amount" [create_random] ; "habitat amount"
-  if submodel = "Configuration - A" [create_landscape_A] ; "1 patch"
-  if submodel = "Configuration - B" [create_landscape_B] ; "2 vertical patches"
-  if submodel = "Configuration - C" [create_landscape_C] ; "2 horizontal patches"
-  if submodel = "Configuration - D" [create_landscape_D] ; "16 pacthes close to road"
-  if submodel = "Configuration - E" [create_landscape_E] ; "16 pacthes away from road"
-  if submodel = "Configuration - F" [create_landscape_F] ; "vertical lines"
-  if submodel = "Configuration - G" [create_landscape_G] ; "horizontal lines"
+  if model = "Habitat amount" [create_random] ; "habitat amount"
+  if model = "Scenario - A" [create_landscape_A] ; "1 patch"
+  if model = "Scenario - B" [create_landscape_B] ; "2 vertical patches"
+  if model = "Scenario - C" [create_landscape_C] ; "2 horizontal patches"
+  if model = "Scenario - D" [create_landscape_D] ; "16 pacthes close to road"
+  if model = "Scenario - E" [create_landscape_E] ; "16 pacthes away from road"
+  if model = "Scenario - F" [create_landscape_F] ; "vertical lines"
+  if model = "Scenario - G" [create_landscape_G] ; "horizontal lines"
 
   ; setup habitat patches
   ask patches with [habitat = 1] [set permeability 100
@@ -309,7 +309,7 @@ to set_filename
      file-print (word
        "N_individuals" ","
        "steps" ","
-       "submodel" ","
+       "model" ","
        "proportion_of_habitat" ","
        "matrix_permeability" ","
        "perceptual_range" ","
@@ -325,7 +325,7 @@ to save_data ;; information to save in the addressed file
   file-print (word
     number_of_individuals ","
     steps ","
-    submodel ","
+    model ","
     proportion_of_habitat ","
     matrix_permeability ","
     perceptual_range ","
@@ -571,9 +571,9 @@ CHOOSER
 135
 345
 180
-submodel
-submodel
-"Habitat amount" "Configuration - A" "Configuration - B" "Configuration - C" "Configuration - D" "Configuration - E" "Configuration - F" "Configuration - G"
+model
+model
+"Habitat amount" "Scenario - A" "Scenario - B" "Scenario - C" "Scenario - D" "Scenario - E" "Scenario - F" "Scenario - G"
 0
 
 INPUTBOX
