@@ -1,17 +1,18 @@
 # ibm-code
 
-* pasta raiz:
-  Código netlogo - crossings.nlogo
-  Scripts
-    - simulations: usado para fazer as simulacoes usando o pacote nlrx - precisa ter o netlogo versao 6.0.4 no computador
-    - sensitivity_analysis: usado para fazer a analise e graficos de sensibilidade, com pacote sensitivity e metodo sobol2007, usando os resultados do script "simulations_sobol_design" 
-    - grafico parametros: usado para os graficos da relacao dos inputs com outputs, com modelo ajustado
-    - aomisc_model_fitting: usado para ajustar e comparar modelos para cada grafico dos parametros, com pacote aomisc/bbmle
+* scripts folder:
+    - simulations: to run and save model simulations on NetLogo
+    - sensitivity_analysis: to run sensitivity analysis using the files created in the script "simulations"
+    - graphs: to create the figures
+    - model_fitting: to evaluated the shape of the response curve between inputs and outputs considering candidate models
+* netlogo_code folder:
+    - _original: code created to the manuscript
+    - _simulations: code adapted to run simulations using R and do sensitivity analysis
 
-* pasta results:
-    - arquivos _simulations.rds = todo o arquivo das simulacoes feitas nos scripts "simulations
-    - arquivos _output.csv = apenas a planilha final de resultados do arquivo .rds
-    - arquiv model_fitting = resultados das competicoes dos modelos
+* results folder:
+    - files _simulations.rds = netlogo objects with all simulations information
+    - files _output.csv = backup with results from files ".rds"
+    - file model_fitting = model selection information
 
-* pasta imagens:
-    figuras dos resultados dos parametros, das analises de sensibilidade, dos cenarios e dos passos do netlogo
+* figures folder:
+    figures for the manuscript and the supplementary material
