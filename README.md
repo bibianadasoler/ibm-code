@@ -16,3 +16,6 @@
 
 * figures folder:
     figures for the manuscript and the supplementary material
+
+* correlation folder:
+    script and results of correlation between number of patches and proportion of habitat
