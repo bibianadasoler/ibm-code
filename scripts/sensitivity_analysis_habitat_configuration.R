@@ -117,5 +117,5 @@ require(ggplot2)
                  patchwork::plot_layout(guides = "collect")) 
 # save
 ggsave(all_together, filename = here::here("figures", "sensitivity_analysis.png"), 
-       dpi = 600, width = 7000, height = 6000, unit = "px")
+       dpi = 300, width = 3500, height = 3000, unit = "px")
 
