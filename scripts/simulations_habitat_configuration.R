@@ -63,7 +63,7 @@ print(nl_crossings)
 
 ## Run and save simulations
 # to run in parallel
-plan(multisession)
+future::plan("multisession")
 progressr::handlers("progress")
 
 # run all simulations
