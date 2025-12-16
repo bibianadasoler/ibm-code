@@ -1,6 +1,5 @@
 ##
-## Article: Wildlife road crossings are not everywhere: a theoretical approach 
-## for maximizing mitigation
+## Article: Wildlife Road Crossings: A Mechanistic Trait- and Landscape-Based Model
 ## doi: 
 #
 ## Script to evaluated the shape of the response curve between inputs and outputs 

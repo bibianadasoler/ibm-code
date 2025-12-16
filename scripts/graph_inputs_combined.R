@@ -1,6 +1,5 @@
 ##
-## Article: Wildlife road crossings are not everywhere: a theoretical approach 
-## for maximizing mitigation
+## Article: Wildlife Road Crossings: A Mechanistic Trait- and Landscape-Based Model
 ## doi: 
 #
 ## Script to create figures for to visually explore the relationship between 
@@ -9,6 +8,7 @@
 #
 # loading ggplot
 library(ggplot2)
+library(dplyr)
 
 # Habitat amount model ----
 # load file with simulations information
@@ -44,7 +44,7 @@ habitat_categoric <- habitat_amount_simulations %>%
              labeller = labeller(class_vision = c("a90-120" = "90-120", "b120-150" = "120-150", "c150-180" = "150-180"),
                                  class_matrix = c("a10-30" = "10-30", "b30-50" = "30-50", "c50-70" = "50-70", "d70-90" = "70-90")))  +
   theme_bw() +
-  labs(title = "Habitat amount model", tag = "A", x = "Perceptual range", y ="Crossings aggregation", col = "Proportion of habitat") +
+  labs(title = "Habitat amount model", tag = "A", x = "Perceptual range", y ="Crossing aggregation", col = "Proportion of habitat") +
   theme(legend.position = "bottom",
         plot.tag.position = c(0.02, 0.99),
         text = element_text(size = 12),
@@ -103,7 +103,7 @@ config_categoric <- habitat_configuration_simulations %>%
              labeller = labeller(class_vision = c("a90-120" = "90-120", "b120-150" = "120-150", "c150-180" = "150-180"),
                                  class_matrix = c("a10-30" = "10-30", "b30-50" = "30-50", "c50-70" = "50-70", "d70-90" = "70-90")))  +
   theme_bw() +
-  labs(title = "Habitat configuration model", tag = "B", x = "Perceptual range", y ="Crossings aggregation", col = "Scenarios") +
+  labs(title = "Habitat configuration model", tag = "B", x = "Perceptual range", y ="Crossing aggregation", col = "Scenarios") +
   theme(legend.position = "bottom",
         plot.tag.position = c(0.02, 0.99),
         text = element_text(size = 12),

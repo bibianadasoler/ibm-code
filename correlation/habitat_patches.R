@@ -8,7 +8,7 @@
 # 
 ## to run this script will be need to download the folder with all raster, which
 ## is heavier than github allowed
-## to download the folder with the rasters go to: https://1drv.ms/f/s!AlTrDSRCiM2NiMVesKAO6ztlOvWoxw?e=35meUu
+## to download the folder with the rasters go to: https://1drv.ms/f/c/8dcd8842240deb54/IgBU6w0kQojNIICN3iICAAAAAQ7_-yWg5IIdN_TVGhDSuAA?e=vFDpIU 
 #
 
 # loading packages

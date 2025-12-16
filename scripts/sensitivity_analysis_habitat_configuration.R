@@ -1,6 +1,5 @@
 ##
-## Article: Wildlife road crossings are not everywhere: a theoretical approach 
-## for maximizing mitigation
+## Article: Wildlife Road Crossings: A Mechanistic Trait- and Landscape-Based Model
 ## doi: 
 #
 ## Script to run sensitivity analysis using the files created in the script to 
@@ -45,7 +44,7 @@ require(ggplot2)
                     position = position_dodge(width = 0.3), size = 0.3) +
     scale_colour_manual(values = c("first-order" = "black", "total" = "grey50"),
                         labels = c("Main effect (*S<sub>i</sub>*)", "Total effect (*S<sub>Ti</sub>*)"), name = " ") +
-    labs(title = "C) Crossings aggregation", y = "Parameters", x = "Sobol Index") +
+    labs(title = "C) Crossing aggregation", y = "Parameters", x = "Sobol Index") +
     scale_x_continuous(limits = c(0, 1)) +
     scale_y_discrete(limits = c("vision_angle", "scenario", "perceptual_range", "matrix_permeability"),
                      labels=c("vision_angle" = "Vision angle", "scenario" = "Scenarios",

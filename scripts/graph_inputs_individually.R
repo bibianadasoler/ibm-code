@@ -1,6 +1,5 @@
 ##
-## Article: Wildlife road crossings are not everywhere: a theoretical approach 
-## for maximizing mitigation
+## Article: Wildlife Road Crossings: A Mechanistic Trait- and Landscape-Based Model
 ## doi: 
 #
 ## Script to create figures using the best-ranked model of input parameters 
@@ -30,7 +29,7 @@ y_values <- coefficients(bragg4)[2] + (coefficients(bragg4)[3] - coefficients(br
               col = "red", linewidth = 0.75) +
     ylim(0,1) + scale_x_continuous(breaks = c(10,30,50,70,90), expand = c(0,0.5)) +
     geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
-    labs(y = "Crossings aggregation", x = "Proportion of habitat", tag = "A") +  
+    labs(y = "Crossing aggregation", x = "Proportion of habitat", tag = "A") +  
     theme(panel.background = element_rect(fill = "white"), 
           panel.border = element_rect(fill = NA, colour = "grey20"),
           plot.tag = element_text(size = 10),
@@ -53,7 +52,7 @@ y_values <- coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coeffic
               col = "red", linewidth = 0.75) +
     ylim(0,1) + scale_x_continuous(breaks = c(10,30,50,70,90), expand = c(0,0.5)) +
     geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
-    labs(y = "Crossings aggregation", x = "Matrix permeability", tag = "B") +  
+    labs(y = "Crossing aggregation", x = "Matrix permeability", tag = "B") +  
     theme(panel.background = element_rect(fill = "white"), 
           panel.border = element_rect(fill = NA, colour = "grey20"),
           plot.tag = element_text(size = 10),
@@ -76,7 +75,7 @@ y_values <- coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coeffic
               col = "red", linewidth = 0.75) +
     ylim(0,1) + scale_x_continuous(breaks = c(5, 15, 25, 35, 42), expand = c(0,0.5)) +
     geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
-    labs(y = "Crossings aggregation", x = "Perceptual range", tag = "C") +
+    labs(y = "Crossing aggregation", x = "Perceptual range", tag = "C") +
     theme(panel.background = element_rect(fill = "white"), 
           panel.border = element_rect(fill = NA, colour = "grey20"),
           plot.tag = element_text(size = 10),
@@ -99,7 +98,7 @@ y_values <- coefficients(exponential_growth)[1] * exp(coefficients(exponential_g
               col = "red", linewidth = 0.75) +
     ylim(0,1) + scale_x_continuous(breaks = c(90, 120, 150, 180), expand = c(0,0.5)) +
     geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
-    labs(y = "Crossings aggregation", x = "Vision angle", tag = "D") +
+    labs(y = "Crossing aggregation", x = "Vision angle", tag = "D") +
     theme(panel.background = element_rect(fill = "white"), 
           panel.border = element_rect(fill = NA, colour = "grey20"),
           plot.tag = element_text(size = 10),
@@ -204,7 +203,7 @@ habitat_configuration_simulations <- habitat_configuration@simdesign@simoutput
    annotate("rect",  xmin = -Inf, xmax = Inf, ymin = 0.75, ymax = 1, alpha = 0.15, fill = "grey15") +
    ggdist::stat_halfeye(adjust = 0.5, width = 0.75, justification = -0.25, .width = 0, point_colour = NA, fill = "black") +
    geom_boxplot(width = 0.15, outlier.color = NA, alpha = 0.5) +
-   labs(y = "Crossings aggregation", x = "Scenarios", tag = "E") +
+   labs(y = "Crossing aggregation", x = "Scenarios", tag = "E") +
    scale_x_discrete(labels=c("1" = "A", "2" = "B", "3" = "C", "4" = "D",
                              "5" = "E", "6" = "F",  "7" = "G"), expand = c(0,0.2)) +
    ylim(0,1)  + 
@@ -229,7 +228,7 @@ y_values <- coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coeffic
     geom_point(size = 0.05) +
     geom_line(data = data.frame(x = x_values, y = y_values), aes(x, y), 
               col = "red", linewidth = 0.75) +
-    labs(y = "Crossings aggregation", x = "Matrix permeability", tag = "F") +
+    labs(y = "Crossing aggregation", x = "Matrix permeability", tag = "F") +
     ylim(0,1) + scale_x_continuous(breaks = c(10,30,50,70,90), expand = c(0,0.5)) +
     geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
     theme(panel.background = element_rect(fill = "white"), 
@@ -252,7 +251,7 @@ y_values <- coefficients(exponential_growth)[1] * exp(coefficients(exponential_g
     geom_point(size = 0.05) +
     geom_line(data = data.frame(x = x_values, y = y_values), aes(x, y), 
               col = "red", linewidth = 0.75) +
-    labs(y = "Crossings aggregation", x = "Perceptual range", tag = "G") +
+    labs(y = "Crossing aggregation", x = "Perceptual range", tag = "G") +
     ylim(0,1) + scale_x_continuous(breaks = c(5, 15, 25, 35, 42), expand = c(0,0.5)) +
     geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
     theme(panel.background = element_rect(fill = "white"), 
@@ -271,7 +270,7 @@ y_values <- coefficients(exponential_growth)[1] * exp(coefficients(exponential_g
    annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.75, ymax = 1, alpha = 0.15, fill = "grey15") +
    geom_point(size = 0.05) +
    geom_smooth(method = "lm", col = "red", linewidth = 0.75) +
-   labs(y = "Crossings aggregation", x = "Vision angle", tag = "H") +
+   labs(y = "Crossing aggregation", x = "Vision angle", tag = "H") +
    ylim(0,1) + scale_x_continuous(breaks = c(90, 120, 150, 180), expand = c(0,0.5)) +
    geom_hline(yintercept = 0.25, linetype = "dashed", color = "black") +
    theme(panel.background = element_rect(fill = "white"), 
@@ -389,3 +388,5 @@ y_values <- coefficients(asymptotic)[3] - (coefficients(asymptotic)[3] - coeffic
 # saving panel
 ggsave(all_together, filename = here::here("figures", "inputs_outputs_relationship.png"), 
        dpi = 300, width = 3200, height = 4200, unit = "px")
+
+
