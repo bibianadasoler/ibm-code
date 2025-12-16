@@ -1,4 +1,4 @@
-# Prioritising road mitigation efforts based on landscape structure and species navigation traits: insights from mechanistic modelling
+# Wildlife Road Crossings: A Mechanistic Trait- and Landscape-Based Model
 Bibiana Terra Dasoler, Fernanda Zimmermann Teixeira, Andreas Kindel, Fernando Ascensão, and Vinicius Bastazini
 
 * scripts folder:
