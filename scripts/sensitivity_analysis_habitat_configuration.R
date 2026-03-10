@@ -44,7 +44,7 @@ require(ggplot2)
                     position = position_dodge(width = 0.3), size = 0.3) +
     scale_colour_manual(values = c("first-order" = "black", "total" = "grey50"),
                         labels = c("Main effect (*S<sub>i</sub>*)", "Total effect (*S<sub>Ti</sub>*)"), name = " ") +
-    labs(title = "C) Crossing aggregation", y = "Parameters", x = "Sobol Index") +
+    labs(title = "C) Crossing concentration", y = "Parameters", x = "Sobol Index") +
     scale_x_continuous(limits = c(0, 1)) +
     scale_y_discrete(limits = c("vision_angle", "scenario", "perceptual_range", "matrix_permeability"),
                      labels=c("vision_angle" = "Vision angle", "scenario" = "Scenarios",
@@ -115,6 +115,6 @@ require(ggplot2)
 (all_together <- patchwork::wrap_elements(habitat_amount) / patchwork::wrap_elements(habitat_configuration) + 
                  patchwork::plot_layout(guides = "collect")) 
 # save
-ggsave(all_together, filename = here::here("figures", "sensitivity_analysis.png"), 
+ggsave(all_together, filename = here::here("figures", "sensitivity_analysis2.png"), 
        dpi = 300, width = 3500, height = 3000, unit = "px")
 

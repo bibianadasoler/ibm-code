@@ -44,7 +44,7 @@ require(ggplot2)
                     position = position_dodge(width = 0.3), size = 0.3) +
     scale_colour_manual(values = c("first-order" = "black", "total" = "grey50"),
                         labels = c("Main effect (*S<sub>i</sub>*)", "Total effect (*S<sub>Ti</sub>*)"), name = " ") +
-    labs(title = "A) Crossing aggregation", y = "Parameters", x = "Sobol Index") +
+    labs(title = "A) Crossing concentration", y = "Parameters", x = "Sobol Index") +
     scale_x_continuous(limits = c(0, 1)) +
     scale_y_discrete(limits = c("vision_angle", "proportion_of_habitat", "perceptual_range", "matrix_permeability"),
                      labels=c("vision_angle" = "Vision angle", "proportion_of_habitat" = "Proportion of habitat",

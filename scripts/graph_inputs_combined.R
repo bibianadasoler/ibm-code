@@ -30,7 +30,7 @@ habitat_categoric <- habitat_amount_simulations %>%
                                                 vision_angle >= 150 & vision_angle <= 180 ~ "c150-180")) %>%
   dplyr::select(assess_top_sections, total_crossings, class_prop, class_matrix, perceptual_range, class_vision) 
 
-# to plot results for crossings aggregation
+# to plot results for crossings concentration
 (habitat_aggreg <- ggplot(habitat_categoric, aes(perceptual_range, assess_top_sections, col = class_prop)) +
   annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.25, ymax = 1, alpha = 0.15, fill = "grey15") +
   annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.5, ymax = 1, alpha = 0.15, fill = "grey15") +
@@ -44,7 +44,7 @@ habitat_categoric <- habitat_amount_simulations %>%
              labeller = labeller(class_vision = c("a90-120" = "90-120", "b120-150" = "120-150", "c150-180" = "150-180"),
                                  class_matrix = c("a10-30" = "10-30", "b30-50" = "30-50", "c50-70" = "50-70", "d70-90" = "70-90")))  +
   theme_bw() +
-  labs(title = "Habitat amount model", tag = "A", x = "Perceptual range", y ="Crossing aggregation", col = "Proportion of habitat") +
+  labs(title = "Habitat amount model", tag = "A", x = "Perceptual range", y ="Crossing concentration", col = "Proportion of habitat") +
   theme(legend.position = "bottom",
         plot.tag.position = c(0.02, 0.99),
         text = element_text(size = 12),
@@ -88,7 +88,7 @@ config_categoric <- habitat_configuration_simulations %>%
          scenario = as.character(scenario)) %>%
   dplyr::select(assess_top_sections, total_crossings, scenario, class_matrix, perceptual_range, class_vision) 
 
-# to plot results for crossings aggregation
+# to plot results for crossings concentration
 (config_aggreg <- ggplot(config_categoric, aes(perceptual_range, assess_top_sections, colour = scenario)) +
   annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.25, ymax = 1, alpha = 0.15, fill = "grey15") +
   annotate("rect", xmin = -Inf, xmax = Inf,  ymin = 0.5, ymax = 1, alpha = 0.15, fill = "grey15") +
@@ -103,7 +103,7 @@ config_categoric <- habitat_configuration_simulations %>%
              labeller = labeller(class_vision = c("a90-120" = "90-120", "b120-150" = "120-150", "c150-180" = "150-180"),
                                  class_matrix = c("a10-30" = "10-30", "b30-50" = "30-50", "c50-70" = "50-70", "d70-90" = "70-90")))  +
   theme_bw() +
-  labs(title = "Habitat configuration model", tag = "B", x = "Perceptual range", y ="Crossing aggregation", col = "Scenarios") +
+  labs(title = "Habitat configuration model", tag = "B", x = "Perceptual range", y ="Crossing concentration", col = "Scenarios") +
   theme(legend.position = "bottom",
         plot.tag.position = c(0.02, 0.99),
         text = element_text(size = 12),
@@ -131,10 +131,10 @@ config_categoric <- habitat_configuration_simulations %>%
         axis.title.x.top = element_text(vjust = .4)) +
   guides(colour = guide_legend(ncol = 7)))
 
-### panel combining plots of crossings aggregation from both models
+### panel combining plots of crossings concentration from both models
 (aggreg <- patchwork::wrap_elements(habitat_aggreg) / patchwork::wrap_elements(config_aggreg))
 # saving
-ggsave(aggreg, filename = here::here("figures", "combined_inputs_aggregation.png"), 
+ggsave(aggreg, filename = here::here("figures", "combined_inputs_concentration.png"), 
        dpi = 300, width = 3200, height = 4200, unit = "px")
 
 

@@ -9,7 +9,7 @@
 #
 
 # loading packages
-library(aomisc)
+library(statforbiology)
 library(bbmle)
 
 # load file with simulations information
